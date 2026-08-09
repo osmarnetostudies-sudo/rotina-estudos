@@ -1,0 +1,13 @@
+{
+  "name": "Rotina & Estudos",
+  "short_name": "Rotina",
+  "description": "Acompanhamento de rotina de estudos, tarefas e autoavaliação diária.",
+  "start_url": "./rotina-estudos.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#2a78d6",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

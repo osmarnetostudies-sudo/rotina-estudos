@@ -1,0 +1,1312 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotina & Estudos</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#2a78d6">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rotina & Estudos">
+<style>
+  :root{
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --surface-2:      #ffffff;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --good:           #0ca30c;
+    --good-text:      #006300;
+    --warning:        #fab219;
+    --serious:        #ec835a;
+    --critical:       #d03b3b;
+    --s1: #2a78d6; /* HM - blue */
+    --s2: #eb6834; /* Tutoria - orange */
+    --s3: #1baf7a; /* PIESF - aqua */
+    --s4: #eda100; /* Morfo - yellow */
+    --s5: #e87ba4; /* PI - magenta */
+    --heat-0: #e1e0d9;
+    --heat-1: #b7d3f6;
+    --heat-2: #5598e7;
+    --heat-3: #1c5cab;
+    --heat-4: #0d366b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --surface-2:      #232322;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --good:           #0ca30c;
+      --good-text:      #0ca30c;
+      --warning:        #fab219;
+      --serious:        #ec835a;
+      --critical:       #d03b3b;
+      --s1: #3987e5;
+      --s2: #d95926;
+      --s3: #199e70;
+      --s4: #c98500;
+      --s5: #d55181;
+      --heat-0: #2c2c2a;
+      --heat-1: #184f95;
+      --heat-2: #256abf;
+      --heat-3: #3987e5;
+      --heat-4: #86b6ef;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page:           #0d0d0d;
+    --surface-2:      #232322;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+    --heat-0: #2c2c2a; --heat-1: #184f95; --heat-2: #256abf; --heat-3: #3987e5; --heat-4: #86b6ef;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--page);
+    color:var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:16px 16px 80px;}
+  a{color:inherit;}
+
+  header.top{
+    position:sticky;top:0;z-index:20;
+    background:var(--surface-1);
+    border-bottom:1px solid var(--border);
+  }
+  .top-inner{
+    max-width:900px;margin:0 auto;padding:12px 16px;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .brand{font-weight:700;font-size:17px;flex:0 0 auto;}
+  .streak{
+    font-size:13px;color:var(--text-secondary);
+    background:var(--surface-2);border:1px solid var(--border);
+    padding:4px 10px;border-radius:999px;
+  }
+  .spacer{flex:1 1 auto;}
+  .icon-btn{
+    background:var(--surface-2);border:1px solid var(--border);color:var(--text-primary);
+    border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;
+  }
+  .icon-btn:hover{filter:brightness(1.05);}
+
+  nav.tabs{
+    max-width:900px;margin:0 auto;padding:0 16px;
+    display:flex;gap:4px;border-bottom:1px solid var(--border);
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    background:none;border:none;color:var(--text-secondary);
+    padding:10px 14px;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;
+    white-space:nowrap;
+  }
+  nav.tabs button.active{color:var(--text-primary);border-bottom-color:var(--s1);font-weight:600;}
+
+  .card{
+    background:var(--surface-1);border:1px solid var(--border);
+    border-radius:14px;padding:16px;margin-bottom:14px;
+  }
+  .card h2{margin:0 0 10px;font-size:15px;}
+  .card h3{margin:0 0 8px;font-size:13px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+  .muted{color:var(--text-muted);}
+  .small{font-size:12px;}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .col{display:flex;flex-direction:column;gap:8px;}
+
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto;}
+  .badge{
+    font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);
+    color:var(--text-secondary);white-space:nowrap;
+  }
+  .badge.hot{color:#fff;background:var(--critical);border-color:var(--critical);}
+  .badge.good{color:#fff;background:var(--good);border-color:var(--good);}
+  .badge.warn{color:#000;background:var(--warning);border-color:var(--warning);}
+
+  button.subj{
+    display:flex;align-items:center;gap:8px;
+    background:var(--surface-2);border:1px solid var(--border);color:var(--text-primary);
+    padding:10px 14px;border-radius:10px;cursor:pointer;font-size:14px;text-align:left;
+  }
+  button.subj:hover{filter:brightness(1.05);}
+  button.subj .dot{width:12px;height:12px;}
+  button.ghost{
+    background:none;border:1px solid var(--border);color:var(--text-secondary);
+    padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;
+  }
+  button.primary{
+    background:var(--s1);border:1px solid var(--s1);color:#fff;
+    padding:9px 16px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;
+  }
+  button.primary.wide{width:100%;justify-content:center;display:flex;}
+  button.danger{background:var(--critical);border-color:var(--critical);color:#fff;}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+
+  .focus-item{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:10px 0;border-bottom:1px solid var(--gridline);
+  }
+  .focus-item:last-child{border-bottom:none;}
+  .focus-item .dot{margin-top:4px;}
+  .focus-item .txt{flex:1;font-size:13.5px;line-height:1.4;}
+  .focus-item .txt b{font-weight:600;}
+
+  .active-bar{
+    background:var(--surface-1);border-bottom:1px solid var(--border);
+    position:sticky;top:53px;z-index:19;
+  }
+  .active-bar-inner{
+    max-width:900px;margin:0 auto;padding:10px 16px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .clock{
+    font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .active-meta{display:flex;flex-direction:column;gap:2px;}
+  .active-meta .name{font-weight:600;font-size:14px;}
+  .active-meta .sub{font-size:12px;color:var(--text-secondary);}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.55);
+    display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;
+  }
+  .modal{
+    background:var(--surface-1);border:1px solid var(--border);border-radius:16px;
+    padding:22px;max-width:380px;width:100%;text-align:center;
+  }
+  .modal .clock{font-size:30px;display:block;margin:10px 0;}
+
+  .bar-track{
+    height:10px;border-radius:999px;background:var(--gridline);overflow:hidden;
+  }
+  .bar-fill{height:100%;border-radius:999px;}
+
+  .subject-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .subject-row:last-child{margin-bottom:0;}
+  .subject-row .label{width:96px;flex:0 0 auto;font-size:13px;font-weight:600;}
+  .subject-row .bar-wrap{flex:1;min-width:100px;}
+  .subject-row .stat{width:118px;flex:0 0 auto;text-align:right;font-size:12px;color:var(--text-secondary);font-variant-numeric:tabular-nums;}
+
+  table.tt{border-collapse:collapse;width:100%;font-size:12.5px;}
+  table.tt th,table.tt td{border:1px solid var(--gridline);padding:6px 8px;vertical-align:top;}
+  table.tt th{background:var(--surface-2);color:var(--text-secondary);font-weight:600;text-align:left;}
+  table.tt td.today-col, table.tt th.today-col{background:color-mix(in srgb, var(--s1) 10%, transparent);}
+  .slot{border-radius:8px;padding:6px 8px;font-size:12px;margin-bottom:4px;}
+  .slot.livre{color:var(--text-muted);border:1px dashed var(--gridline);}
+
+  input[type=number], input[type=text], input[type=date], select{
+    background:var(--surface-2);border:1px solid var(--border);color:var(--text-primary);
+    border-radius:8px;padding:7px 10px;font-size:13px;
+  }
+  input[type=number]{width:70px;}
+  label.field{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--gridline);}
+  label.field:last-child{border-bottom:none;}
+
+  .task-item{display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid var(--gridline);font-size:13.5px;}
+  .task-item:last-child{border-bottom:none;}
+  .task-item input[type=checkbox]{margin-top:3px;flex:0 0 auto;}
+  .task-item .dot{margin-top:5px;}
+  .task-item .txt{flex:1;line-height:1.4;}
+  .task-item .txt.done{text-decoration:line-through;color:var(--text-muted);}
+  .task-item .del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:0 4px;flex:0 0 auto;}
+
+  .topics{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+  .topic{display:flex;align-items:center;gap:8px;font-size:13px;}
+  .topic.done span.t{text-decoration:line-through;color:var(--text-muted);}
+  .topic button{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:0 4px;}
+  .add-topic{display:flex;gap:6px;margin-top:8px;}
+  .add-topic input{flex:1;}
+
+  .heat-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;}
+  .heat-cell{aspect-ratio:1;border-radius:3px;}
+  .h0{background:var(--heat-0);}
+  .h1{background:var(--heat-1);}
+  .h2{background:var(--heat-2);}
+  .h3{background:var(--heat-3);}
+  .h4{background:var(--heat-4);}
+
+  .hist-item{
+    display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gridline);font-size:13px;
+  }
+  .hist-item:last-child{border-bottom:none;}
+  .hist-item .meta{flex:1;min-width:0;}
+  .hist-item .meta .l1{font-weight:600;}
+  .hist-item .meta .l2{color:var(--text-muted);font-size:12px;}
+  .hist-item .dur{font-variant-numeric:tabular-nums;font-size:13px;color:var(--text-secondary);white-space:nowrap;}
+
+  .flag{color:var(--warning);font-size:11px;}
+
+  @media (max-width:600px){
+    .subject-row .label{width:74px;font-size:12px;}
+    .subject-row .stat{width:90px;font-size:11px;}
+    table.tt{font-size:11px;}
+    .clock{font-size:19px;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+'use strict';
+
+/* ---------- static data ---------- */
+
+const STORAGE_KEY = 'rotinaEstudosV1';
+const ORIGINAL_TITLE = 'Rotina & Estudos';
+
+const SLOT_VAR = {1:'--s1',2:'--s2',3:'--s3',4:'--s4',5:'--s5'};
+
+const HM_SUBTOPICS = [
+  {key:'cardiopneumo', label:'Cardio/Pneumo — Profª Dora 🔥'},
+  {key:'gineco', label:'Ginecologia — Prof. Selvio'},
+  {key:'pediatria', label:'Pediatria — Profª Daniela'},
+  {key:'geral', label:'Geral / outros'}
+];
+const TUTORIA_MODES = [
+  {key:'fechamento', label:'Fechamento (aprofundado) — pra sexta'},
+  {key:'abertura', label:'Abertura (prévia leve) — pra terça'},
+  {key:'geral', label:'Revisão geral'}
+];
+
+const DAY_ORDER = ['seg','ter','qua','qui','sex'];
+const DAY_NAMES = {seg:'Segunda', ter:'Terça', qua:'Quarta', qui:'Quinta', sex:'Sexta'};
+const DAY_FULL  = {seg:'Segunda-feira', ter:'Terça-feira', qua:'Quarta-feira', qui:'Quinta-feira', sex:'Sexta-feira'};
+
+const SCHEDULE = {
+  seg: [
+    {start:'08:00', end:'11:40', label:'Morfo + PI', type:'aula'},
+    {start:'13:00', end:'16:40', label:'PIESF', type:'aula'}
+  ],
+  ter: [
+    {start:'08:00', end:'11:40', label:'Tutoria 14 (Abertura) — Profª Maysa', type:'aula'},
+    {start:'13:00', end:'14:40', label:'Livre', type:'livre'},
+    {start:'15:00', end:'16:40', label:'HM: Ginecologia — Prof. Selvio (C4, sala 816)', type:'aula'}
+  ],
+  qua: [
+    {start:'—', end:'—', label:'Livre (dia todo)', type:'livre'}
+  ],
+  qui: [
+    {start:'08:00', end:'12:00', label:'Livre (manhã)', type:'livre'},
+    {start:'13:00', end:'14:40', label:'HM: Pediatria — Profª Daniela (C3, sala 821)', type:'aula'},
+    {start:'15:00', end:'16:40', label:'HM: Cardio/Pneumo — Profª Dora (C4, sala 820) 🔥', type:'aula'}
+  ],
+  sex: [
+    {start:'08:00', end:'11:40', label:'Tutoria 14 (Fechamento) — Profª Maysa', type:'aula'},
+    {start:'13:00', end:'17:00', label:'Livre (tarde)', type:'livre'}
+  ]
+};
+
+const FOCUS = {
+  seg: [
+    {subject:'morfo', note:'Revisar o que rolou na aula de hoje (Anatomia/Histologia) enquanto está fresco.'},
+    {subject:'pi', note:'Revisar Práticas Integradas do período da manhã.'},
+    {subject:'piesf', note:'Fixar o conteúdo da aula da tarde antes de esquecer.'}
+  ],
+  ter: [
+    {subject:'tutoria', mode:'abertura', note:'Antes da aula: só uma leitura prévia leve do tema. Não precisa aprofundar hoje.'},
+    {subject:'hm', subtopic:'gineco', note:'Depois da aula de Ginecologia: revisar e já ir decorando os pontos-chave.'},
+    {subject:'tutoria', mode:'fechamento', note:'Se sobrar tempo à tarde (13h–14h40 livre): adiantar o aprofundamento pro fechamento de sexta.'}
+  ],
+  qua: [
+    {subject:'tutoria', mode:'fechamento', note:'Dia livre inteiro — é o principal dia pra aprofundar o que você vai apresentar na sexta.'},
+    {subject:'hm', subtopic:'cardiopneumo', note:'Aproveite o dia livre pra decorar HM com calma, principalmente o conteúdo da Profª Dora.'},
+    {subject:'piesf', note:'Colocar em dia.'},
+    {subject:'morfo', note:'Colocar em dia.'},
+    {subject:'pi', note:'Colocar em dia.'}
+  ],
+  qui: [
+    {subject:'tutoria', mode:'fechamento', note:'Última chance de aprofundar antes da apresentação de amanhã — capriche.'},
+    {subject:'hm', subtopic:'cardiopneumo', note:'Depois da aula da Profª Dora: revisão pesada e decoreba enquanto está fresco na cabeça (ela cobra "rodapé de livro").'},
+    {subject:'hm', subtopic:'pediatria', note:'Revisar a aula de Pediatria da Profª Daniela.'}
+  ],
+  sex: [
+    {subject:'tutoria', mode:'fechamento', note:'Reforço final antes da apresentação, se precisar.'},
+    {subject:'piesf', note:'Tarde livre: colocar as matérias "menores" em dia.'},
+    {subject:'morfo', note:'Tarde livre: colocar em dia.'},
+    {subject:'pi', note:'Tarde livre: colocar em dia.'}
+  ]
+};
+
+/* ---------- state ---------- */
+
+function defaultState(){
+  return {
+    version: 1,
+    subjects: {
+      hm:      {name:'Habilidades Médicas', short:'HM', slot:1, weeklyTargetMin:360, priority:1,
+                note:'Cobrança forte de decoreba ("rodapé de livro"), principalmente com a Profª Dora.'},
+      tutoria: {name:'Tutoria', short:'Tutoria', slot:2, weeklyTargetMin:300, priority:1,
+                note:'Terça é abertura (prévia leve). O aprofundamento pesado é pro fechamento de sexta.'},
+      piesf:   {name:'PIESF', short:'PIESF', slot:3, weeklyTargetMin:180, priority:2, note:''},
+      morfo:   {name:'Morfologia', short:'Morfo', slot:4, weeklyTargetMin:180, priority:2, note:''},
+      pi:      {name:'Práticas Integradas', short:'PI', slot:5, weeklyTargetMin:180, priority:2, note:''}
+    },
+    settings: {checkInMinutes:25, graceMinutes:10, soundOn:true, notifBannerDismissed:false},
+    active: null,
+    pendingCheckIn: null,
+    sessions: [],
+    dailyReviews: {},
+    tasks: [],
+    ui: {tab:'hoje', theme:null}
+  };
+}
+
+let state = loadState();
+let pendingNewSession = null; // transient, not persisted
+let titleFlashInterval = null;
+let titleFlashOn = false;
+
+function loadState(){
+  let raw = null;
+  try{ raw = JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){}
+  const d = defaultState();
+  if(!raw) return d;
+  const merged = Object.assign({}, d, raw);
+  merged.subjects = Object.assign({}, d.subjects, raw.subjects);
+  for(const k in merged.subjects){
+    merged.subjects[k] = Object.assign({}, d.subjects[k]||{}, merged.subjects[k]);
+  }
+  merged.settings = Object.assign({}, d.settings, raw.settings);
+  merged.ui = Object.assign({}, d.ui, raw.ui);
+  merged.sessions = raw.sessions || [];
+  merged.dailyReviews = raw.dailyReviews || {};
+  merged.tasks = raw.tasks || [];
+  return merged;
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+/* ---------- time helpers ---------- */
+
+function fmtClock(ms){
+  let s = Math.floor(ms/1000);
+  const h = Math.floor(s/3600); s -= h*3600;
+  const m = Math.floor(s/60); s -= m*60;
+  return (h>0 ? String(h).padStart(2,'0')+':' : '') + String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function fmtDuration(ms){
+  const totalMin = Math.round(ms/60000);
+  const h = Math.floor(totalMin/60), m = totalMin%60;
+  if(h<=0) return m+'min';
+  if(m===0) return h+'h';
+  return h+'h'+String(m).padStart(2,'0');
+}
+function activeElapsedMs(active){
+  if(!active) return 0;
+  let sum = 0;
+  for(const seg of active.segments){ sum += (seg.end||Date.now()) - seg.start; }
+  return sum;
+}
+function localDateKey(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function todayKey(){
+  const d = new Date();
+  const idx = d.getDay(); // 0 sun .. 6 sat
+  const map = {1:'seg',2:'ter',3:'qua',4:'qui',5:'sex'};
+  return map[idx] || null;
+}
+function weekStart(d=new Date()){
+  const dt = new Date(d);
+  const day = dt.getDay();
+  const diff = (day===0 ? -6 : 1-day);
+  dt.setHours(0,0,0,0);
+  dt.setDate(dt.getDate()+diff);
+  return dt;
+}
+function inCurrentWeek(ts){
+  const ws = weekStart().getTime();
+  return ts>=ws && ts<ws+7*24*3600*1000;
+}
+function weekdayProgressFraction(){
+  const day = new Date().getDay();
+  const idx = day===0 ? 7 : day;
+  return Math.min(idx,5)/5;
+}
+
+/* ---------- derived stats ---------- */
+
+function weeklyMinutesBySubject(){
+  const res = {};
+  for(const k in state.subjects) res[k]=0;
+  for(const s of state.sessions){
+    if(inCurrentWeek(s.endedAt)) res[s.subject] = (res[s.subject]||0) + s.durationMs/60000;
+  }
+  if(state.active){
+    res[state.active.subject] = (res[state.active.subject]||0) + activeElapsedMs(state.active)/60000;
+  }
+  return res;
+}
+function dailyTotals(){
+  const map = {};
+  for(const s of state.sessions){
+    const key = localDateKey(new Date(s.endedAt));
+    map[key] = (map[key]||0) + s.durationMs;
+  }
+  if(state.active){
+    const key = localDateKey(new Date());
+    map[key] = (map[key]||0) + activeElapsedMs(state.active);
+  }
+  return map;
+}
+function computeStreak(){
+  const totals = dailyTotals();
+  const MIN_MS = 15*60000; // a day only "counts" once real focus time was logged
+  let cursor = new Date();
+  if(!(totals[localDateKey(cursor)] >= MIN_MS)) cursor.setDate(cursor.getDate()-1);
+  let streak = 0;
+  while(true){
+    const key = localDateKey(cursor);
+    if(totals[key] >= MIN_MS){ streak++; cursor.setDate(cursor.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+/* ---------- session lifecycle ---------- */
+
+function startSession(subject, subtopic, mode){
+  if(state.active) return;
+  state.active = {
+    id: uid(), subject, subtopic: subtopic||null, mode: mode||null,
+    segments: [{start:Date.now(), end:null}],
+    lastCheckInTs: Date.now(), status:'running', topics:[]
+  };
+  state.pendingCheckIn = null;
+  pendingNewSession = null;
+  saveState(); render();
+}
+function pauseSession(){
+  if(!state.active || state.active.status!=='running') return;
+  const segs = state.active.segments;
+  segs[segs.length-1].end = Date.now();
+  state.active.status = 'paused';
+  state.pendingCheckIn = null;
+  stopTitleFlash();
+  saveState(); render();
+}
+function resumeSession(){
+  if(!state.active || state.active.status!=='paused') return;
+  state.active.segments.push({start:Date.now(), end:null});
+  state.active.status = 'running';
+  state.active.lastCheckInTs = Date.now();
+  saveState(); render();
+}
+function finishSession(endTs, extra){
+  extra = extra || {};
+  if(!state.active) return;
+  const segs = state.active.segments.map(s=>Object.assign({}, s));
+  if(segs.length && segs[segs.length-1].end===null) segs[segs.length-1].end = endTs;
+  const durationMs = Math.max(0, segs.reduce((a,s)=>a+((s.end||endTs)-s.start),0));
+  const record = {
+    id: state.active.id, subject: state.active.subject, subtopic: state.active.subtopic, mode: state.active.mode,
+    topics: state.active.topics, durationMs,
+    startedAt: segs[0].start, endedAt: endTs,
+    flagged: !!extra.flagged, note: extra.note||''
+  };
+  state.sessions.unshift(record);
+  state.active = null;
+  state.pendingCheckIn = null;
+  stopTitleFlash();
+  saveState(); render();
+}
+function discardActiveSession(){
+  if(!state.active) return;
+  if(!confirm('Descartar esta sessão sem salvar o tempo estudado?')) return;
+  state.active = null;
+  state.pendingCheckIn = null;
+  stopTitleFlash();
+  saveState(); render();
+}
+function deleteSession(id){
+  if(!confirm('Excluir esta sessão do histórico?')) return;
+  state.sessions = state.sessions.filter(s=>s.id!==id);
+  saveState(); render();
+}
+
+function addTopic(text){
+  if(!state.active) return;
+  const t = (text||'').trim();
+  if(!t) return;
+  state.active.topics.push({id:uid(), text:t, done:false});
+  saveState(); render();
+}
+function toggleTopic(id){
+  if(!state.active) return;
+  const t = state.active.topics.find(x=>x.id===id);
+  if(t){ t.done = !t.done; saveState(); render(); }
+}
+function removeTopic(id){
+  if(!state.active) return;
+  state.active.topics = state.active.topics.filter(x=>x.id!==id);
+  saveState(); render();
+}
+
+/* ---------- daily self-review ---------- */
+
+function todayFullKey(){ return localDateKey(new Date()); }
+function getTodayReview(){ return state.dailyReviews[todayFullKey()] || null; }
+function ensureTodayReview(){
+  const k = todayFullKey();
+  if(!state.dailyReviews[k]) state.dailyReviews[k] = {rating:null, procrastinated:null, note:''};
+  return state.dailyReviews[k];
+}
+function setReviewRating(v){
+  const rev = ensureTodayReview();
+  rev.rating = v; rev.updatedAt = Date.now();
+  saveState(); render();
+}
+function setReviewProcrastinated(v){
+  const rev = ensureTodayReview();
+  rev.procrastinated = v; rev.updatedAt = Date.now();
+  saveState(); render();
+}
+function setReviewNote(text){
+  const rev = ensureTodayReview();
+  rev.note = text; rev.updatedAt = Date.now();
+  saveState();
+}
+
+/* ---------- pending tasks ---------- */
+
+function addTask(text, subject, dueDate){
+  const t = (text||'').trim();
+  if(!t) return;
+  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, done:false, createdAt:Date.now()});
+  saveState(); render();
+}
+function submitNewTask(){
+  const textEl = document.getElementById('taskTextInput');
+  const subjEl = document.getElementById('taskSubjectSelect');
+  const dueEl = document.getElementById('taskDueInput');
+  if(!textEl || !textEl.value.trim()) return;
+  addTask(textEl.value, subjEl.value||null, dueEl.value||null);
+}
+function toggleTaskDone(id){
+  const t = state.tasks.find(x=>x.id===id);
+  if(t){ t.done = !t.done; saveState(); render(); }
+}
+function deleteTask(id){
+  if(!confirm('Excluir esta tarefa?')) return;
+  state.tasks = state.tasks.filter(x=>x.id!==id);
+  saveState(); render();
+}
+function sortTasksByDue(a,b){
+  if(a.dueDate && b.dueDate) return a.dueDate<b.dueDate?-1:(a.dueDate>b.dueDate?1:0);
+  if(a.dueDate) return -1;
+  if(b.dueDate) return 1;
+  return b.createdAt - a.createdAt;
+}
+function daysUntil(dueDate){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const due = new Date(dueDate+'T00:00:00');
+  return Math.round((due-today)/86400000);
+}
+function dueBadge(dueDate){
+  const diff = daysUntil(dueDate);
+  if(diff<0) return '<span class="badge hot">atrasada há '+Math.abs(diff)+'d</span>';
+  if(diff===0) return '<span class="badge hot">vence hoje</span>';
+  if(diff===1) return '<span class="badge warn">vence amanhã</span>';
+  if(diff<=3) return '<span class="badge warn">faltam '+diff+'d</span>';
+  return '<span class="badge">faltam '+diff+'d</span>';
+}
+
+/* ---------- check-in / notification engine ---------- */
+
+function beep(){
+  if(!state.settings.soundOn) return;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [0,0.28].forEach(delay=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sine'; o.frequency.value = 880;
+      o.connect(g); g.connect(ctx.destination);
+      const t0 = ctx.currentTime+delay;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.16, t0+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+0.24);
+      o.start(t0); o.stop(t0+0.26);
+    });
+  }catch(e){}
+}
+function notifyOS(title, body){
+  if(typeof Notification==='undefined') return;
+  if(Notification.permission!=='granted') return;
+  try{
+    const n = new Notification(title, {body, tag:'checkin', renotify:true});
+    n.onclick = () => { window.focus(); n.close(); };
+  }catch(e){}
+}
+function startTitleFlash(){
+  if(titleFlashInterval) return;
+  titleFlashInterval = setInterval(()=>{
+    titleFlashOn = !titleFlashOn;
+    document.title = titleFlashOn ? '⏰ Ainda estudando?' : ORIGINAL_TITLE;
+  }, 1000);
+}
+function stopTitleFlash(){
+  if(titleFlashInterval){ clearInterval(titleFlashInterval); titleFlashInterval=null; }
+  document.title = ORIGINAL_TITLE;
+}
+function issueCheckIn(){
+  state.pendingCheckIn = {issuedAt: Date.now()};
+  saveState();
+  beep();
+  const subj = state.subjects[state.active.subject];
+  notifyOS('Ainda estudando?', subj.name + ' — ' + fmtDuration(activeElapsedMs(state.active)) + ' até agora. Toque pra confirmar.');
+  startTitleFlash();
+  render();
+}
+function respondCheckIn(yes){
+  if(!state.pendingCheckIn) return;
+  if(yes){
+    state.active.lastCheckInTs = Date.now();
+    state.pendingCheckIn = null;
+    stopTitleFlash();
+    saveState(); render();
+  } else {
+    finishSession(Date.now(), {});
+  }
+}
+function heartbeat(){
+  if(!state.active || state.active.status!=='running') return;
+  const now = Date.now();
+  if(state.pendingCheckIn){
+    if(now - state.pendingCheckIn.issuedAt >= state.settings.graceMinutes*60000){
+      const cutoff = state.pendingCheckIn.issuedAt;
+      finishSession(cutoff, {flagged:true, note:'Encerrada automaticamente — sem resposta ao check-in.'});
+    }
+  } else {
+    if(now - state.active.lastCheckInTs >= state.settings.checkInMinutes*60000){
+      issueCheckIn();
+    }
+  }
+}
+function updateLiveClock(){
+  const el = document.getElementById('liveClock');
+  if(el && state.active) el.textContent = fmtClock(activeElapsedMs(state.active));
+  const mel = document.getElementById('modalClock');
+  if(mel && state.active) mel.textContent = fmtClock(activeElapsedMs(state.active));
+}
+
+function requestNotifPermission(){
+  if(typeof Notification==='undefined'){ alert('Este navegador não suporta notificações.'); return; }
+  Notification.requestPermission().then(perm=>{
+    state.settings.notifBannerDismissed = true;
+    saveState();
+    if(perm==='denied'){
+      alert('As notificações foram bloqueadas. Pra reativar, libere manualmente nas configurações de site/arquivo do navegador.');
+    } else if(perm!=='granted'){
+      alert('O navegador não confirmou a permissão. Em arquivos abertos localmente (file://) isso às vezes falha silenciosamente — se quiser tentar de novo, use as configurações de notificação do próprio navegador.');
+    }
+    render();
+  });
+}
+function dismissNotifBanner(){
+  state.settings.notifBannerDismissed = true;
+  saveState(); render();
+}
+
+/* ---------- new-session flow (transient UI) ---------- */
+
+function beginNewSessionFlow(subject){
+  if(state.active) return;
+  pendingNewSession = {subject};
+  render();
+}
+function chooseSubtopic(key){ if(pendingNewSession){ pendingNewSession.subtopic = key; render(); } }
+function chooseMode(key){ if(pendingNewSession){ pendingNewSession.mode = key; render(); } }
+function confirmStartSession(){
+  if(!pendingNewSession) return;
+  startSession(pendingNewSession.subject, pendingNewSession.subtopic, pendingNewSession.mode);
+}
+function cancelNewSessionFlow(){ pendingNewSession = null; render(); }
+
+/* ---------- settings ---------- */
+
+function setTab(tab){ state.ui.tab = tab; pendingNewSession=null; saveState(); render(); }
+function setTheme(t){
+  state.ui.theme = t;
+  document.documentElement.setAttribute('data-theme', t || '');
+  if(!t) document.documentElement.removeAttribute('data-theme');
+  saveState(); render();
+}
+function toggleTheme(){
+  const cur = state.ui.theme;
+  if(cur==='dark') setTheme('light');
+  else if(cur==='light') setTheme(null);
+  else setTheme('dark');
+}
+function updateTarget(key, hours){
+  const v = Math.max(0, parseFloat(hours)||0);
+  state.subjects[key].weeklyTargetMin = Math.round(v*60);
+  saveState(); render();
+}
+function updateSetting(key, val){
+  state.settings[key] = Math.max(1, parseInt(val)||1);
+  saveState();
+}
+function toggleSound(){
+  state.settings.soundOn = !state.settings.soundOn;
+  saveState(); render();
+}
+function resetAll(){
+  if(!confirm('Isso vai apagar TODO o histórico e as configurações. Tem certeza?')) return;
+  if(!confirm('Confirma de novo — essa ação não pode ser desfeita.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = defaultState();
+  render();
+}
+
+/* ---------- render ---------- */
+
+function subjColor(key){ return 'var(' + SLOT_VAR[state.subjects[key].slot] + ')'; }
+function subjLabel(rec){
+  const s = state.subjects[rec.subject];
+  let extra = '';
+  if(rec.subject==='hm' && rec.subtopic){
+    const f = HM_SUBTOPICS.find(x=>x.key===rec.subtopic);
+    if(f) extra = f.label;
+  } else if(rec.subject==='tutoria' && rec.mode){
+    const f = TUTORIA_MODES.find(x=>x.key===rec.mode);
+    if(f) extra = f.label;
+  }
+  return {name:s.name, extra};
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML =
+    renderHeader() +
+    renderActiveBar() +
+    '<div class="wrap" id="mainWrap">' + renderTab() + '</div>' +
+    renderCheckInModal();
+  updateLiveClock();
+}
+
+function renderHeader(){
+  const streak = computeStreak();
+  const pendingCount = state.tasks.filter(t=>!t.done).length;
+  const tabs = [['hoje','Hoje'],['tarefas','Tarefas'],['semana','Semana'],['progresso','Progresso'],['config','Config']];
+  const themeIcon = state.ui.theme==='dark' ? '🌙' : (state.ui.theme==='light' ? '☀️' : '🖥️');
+  return (
+  '<header class="top"><div class="top-inner">' +
+    '<div class="brand">📚 Rotina & Estudos</div>' +
+    '<div class="streak">🔥 ' + streak + ' dia' + (streak===1?'':'s') + ' seguido' + (streak===1?'':'s') + '</div>' +
+    (pendingCount ? '<button class="streak" style="cursor:pointer;border:1px solid var(--border);" onclick="setTab(\'tarefas\')">📌 '+pendingCount+' pendente'+(pendingCount===1?'':'s')+'</button>' : '') +
+    '<div class="spacer"></div>' +
+    '<button class="icon-btn" onclick="toggleTheme()" title="Tema">' + themeIcon + '</button>' +
+  '</div>' +
+  '<nav class="tabs">' +
+    tabs.map(t=>'<button class="'+(state.ui.tab===t[0]?'active':'')+'" onclick="setTab(\''+t[0]+'\')">'+t[1]+'</button>').join('') +
+  '</nav></header>'
+  );
+}
+
+function renderActiveBar(){
+  if(!state.active) return '';
+  const s = state.subjects[state.active.subject];
+  const lbl = subjLabel(state.active);
+  const color = subjColor(state.active.subject);
+  const statusTxt = state.active.status==='running' ? 'estudando agora' : 'pausado';
+  return (
+  '<div class="active-bar"><div class="active-bar-inner">' +
+    '<span class="dot" style="background:'+color+';width:14px;height:14px;"></span>' +
+    '<div class="active-meta">' +
+      '<div class="name">'+lbl.name+(lbl.extra?' · '+lbl.extra:'')+'</div>' +
+      '<div class="sub">'+statusTxt+'</div>' +
+    '</div>' +
+    '<div class="clock" id="liveClock">'+fmtClock(activeElapsedMs(state.active))+'</div>' +
+    '<div class="spacer"></div>' +
+    (state.active.status==='running'
+      ? '<button class="ghost" onclick="pauseSession()">⏸ Pausar</button>'
+      : '<button class="ghost" onclick="resumeSession()">▶ Retomar</button>') +
+    '<button class="primary" onclick="finishSession(Date.now(),{})">✔ Concluir</button>' +
+    '<button class="ghost" onclick="discardActiveSession()">Descartar</button>' +
+  '</div></div>'
+  );
+}
+
+function renderCheckInModal(){
+  if(!state.pendingCheckIn) return '';
+  const s = state.subjects[state.active.subject];
+  const graceLeftMs = Math.max(0, state.settings.graceMinutes*60000 - (Date.now()-state.pendingCheckIn.issuedAt));
+  return (
+  '<div class="modal-overlay"><div class="modal">' +
+    '<div style="font-size:28px;">⏰</div>' +
+    '<h2 style="margin:8px 0 0;">Ainda estudando '+s.name+'?</h2>' +
+    '<span class="clock" id="modalClock">'+fmtClock(activeElapsedMs(state.active))+'</span>' +
+    '<div class="small muted">Se não responder em '+Math.ceil(graceLeftMs/60000)+' min, a sessão encerra sozinha (sem contar o tempo parado).</div>' +
+    '<div class="row" style="justify-content:center;margin-top:16px;">' +
+      '<button class="primary" onclick="respondCheckIn(true)">Sim, continuar</button>' +
+      '<button class="ghost" onclick="respondCheckIn(false)">Não, já parei</button>' +
+    '</div>' +
+  '</div></div>'
+  );
+}
+
+function renderTab(){
+  if(state.ui.tab==='hoje') return renderHoje();
+  if(state.ui.tab==='tarefas') return renderTarefas();
+  if(state.ui.tab==='semana') return renderSemana();
+  if(state.ui.tab==='progresso') return renderProgresso();
+  if(state.ui.tab==='config') return renderConfig();
+  return '';
+}
+
+function renderTaskItem(t){
+  const subj = t.subject && state.subjects[t.subject] ? state.subjects[t.subject] : null;
+  const color = subj ? subjColor(t.subject) : 'var(--text-muted)';
+  const label = subj ? subj.short : 'Geral';
+  return '<div class="task-item">' +
+    '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTaskDone(\''+t.id+'\')">' +
+    '<span class="dot" style="background:'+color+';"></span>' +
+    '<div class="txt'+(t.done?' done':'')+'"><b>'+label+'</b> — '+escapeHtml(t.text)+
+      (t.dueDate && !t.done ? ' ' + dueBadge(t.dueDate) : '') +
+    '</div>' +
+    '<button class="del" onclick="deleteTask(\''+t.id+'\')">✕</button>' +
+  '</div>';
+}
+
+function renderPendingTasksWidget(){
+  const pending = state.tasks.filter(t=>!t.done).sort(sortTasksByDue);
+  if(!pending.length) return '';
+  const urgent = pending.filter(t=>t.dueDate && daysUntil(t.dueDate)<=2);
+  const show = (urgent.length ? urgent : pending).slice(0,4);
+  return '<div class="card">' +
+    '<div class="row" style="justify-content:space-between;">' +
+      '<h2 style="margin:0;">📌 Pendências ('+pending.length+')</h2>' +
+      '<button class="ghost" onclick="setTab(\'tarefas\')">Ver todas</button>' +
+    '</div>' +
+    '<div style="margin-top:6px;">' + show.map(renderTaskItem).join('') + '</div>' +
+  '</div>';
+}
+
+function renderTarefas(){
+  let html = '<div class="card"><h2>Nova tarefa</h2><div class="col">';
+  html += '<input type="text" id="taskTextInput" placeholder="O que precisa ser feito?" style="width:100%;" onkeydown="if(event.key===\'Enter\'){submitNewTask();}">';
+  html += '<div class="row">';
+  html += '<select id="taskSubjectSelect"><option value="">Geral</option>' +
+    Object.keys(state.subjects).map(k=>'<option value="'+k+'">'+state.subjects[k].name+'</option>').join('') +
+  '</select>';
+  html += '<input type="date" id="taskDueInput">';
+  html += '<button class="primary" onclick="submitNewTask()">+ Adicionar</button>';
+  html += '</div></div></div>';
+
+  const pending = state.tasks.filter(t=>!t.done).sort(sortTasksByDue);
+  const done = state.tasks.filter(t=>t.done);
+
+  html += '<div class="card"><h2>Pendentes ('+pending.length+')</h2>';
+  html += pending.length ? pending.map(renderTaskItem).join('') : '<div class="muted small">Nenhuma tarefa pendente. 🎉</div>';
+  html += '</div>';
+
+  if(done.length){
+    html += '<div class="card"><h2>Concluídas</h2>';
+    html += done.map(renderTaskItem).join('');
+    html += '</div>';
+  }
+  return html;
+}
+
+function renderHoje(){
+  const dk = todayKey();
+  let html = '';
+
+  html += renderPendingTasksWidget();
+
+  if(typeof Notification!=='undefined' && Notification.permission==='default' && !state.settings.notifBannerDismissed){
+    html += '<div class="card row" style="justify-content:space-between;">' +
+      '<div class="small">Ative as notificações pra receber os check-ins mesmo se você sair da aba.</div>' +
+      '<div class="row">' +
+        '<button class="primary" onclick="requestNotifPermission()">Ativar notificações</button>' +
+        '<button class="ghost" onclick="dismissNotifBanner()">Agora não</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  html += '<div class="card"><h2>Hoje · ' + (dk?DAY_FULL[dk]:'Fim de semana') + '</h2>';
+  if(dk){
+    html += (SCHEDULE[dk]||[]).map(slot=>{
+      const cls = slot.type==='livre' ? 'slot livre' : 'slot';
+      const style = slot.type==='livre' ? '' : 'background:var(--surface-2);border:1px solid var(--border);';
+      return '<div class="'+cls+'" style="'+style+'"><b>'+slot.start+(slot.end&&slot.end!=='—'?'–'+slot.end:'')+'</b> — '+slot.label+'</div>';
+    }).join('');
+  } else {
+    html += '<div class="muted small">Sem aula hoje — bom dia pra colocar Tutoria, HM ou as demais matérias em dia.</div>';
+  }
+  html += '</div>';
+
+  const focusList = dk ? (FOCUS[dk]||[]) : [
+    {subject:'tutoria', mode:'fechamento', note:'Aproveitar o fim de semana pra aprofundar Tutoria e HM sem a correria da semana.'},
+    {subject:'hm', subtopic:'cardiopneumo', note:'Bom momento pra decorar o conteúdo da Profª Dora com calma.'}
+  ];
+  html += '<div class="card"><h2>Sugestão de foco de hoje</h2>';
+  html += focusList.map(f=>{
+    const s = state.subjects[f.subject];
+    let extra = '';
+    if(f.subtopic){ const x=HM_SUBTOPICS.find(h=>h.key===f.subtopic); if(x) extra=x.label; }
+    if(f.mode){ const x=TUTORIA_MODES.find(h=>h.key===f.mode); if(x) extra=x.label; }
+    return '<div class="focus-item">' +
+      '<span class="dot" style="background:'+subjColor(f.subject)+';"></span>' +
+      '<div class="txt"><b>'+s.name+(extra?' · '+extra:'')+'</b><br>'+f.note+'</div>' +
+    '</div>';
+  }).join('');
+  html += '</div>';
+
+  html += '<div class="card"><h2>Sessão de estudo</h2>';
+  if(state.active){
+    html += '<div class="small muted">Você já tem uma sessão rolando lá em cima. Marque os tópicos que for revisando:</div>';
+    html += renderTopicsEditor();
+  } else if(pendingNewSession){
+    html += renderNewSessionFlow();
+  } else {
+    html += '<div class="col">';
+    html += Object.keys(state.subjects).map(k=>{
+      const s = state.subjects[k];
+      const prio = s.priority===1 ? '<span class="badge hot">prioridade alta</span>' : '<span class="badge">padrão</span>';
+      return '<button class="subj" onclick="beginNewSessionFlow(\''+k+'\')">' +
+        '<span class="dot" style="background:'+subjColor(k)+';"></span>' +
+        '<span style="flex:1;">'+s.name+'</span>' + prio +
+      '</button>';
+    }).join('');
+    html += '</div>';
+  }
+  html += '</div>';
+
+  html += renderDailyReview();
+
+  return html;
+}
+
+function renderDailyReview(){
+  const rev = getTodayReview();
+  const emojis = ['😩','🙁','😐','🙂','🤩'];
+  let html = '<div class="card"><h2>Como foi seu dia?</h2>';
+  html += '<div class="small muted" style="margin-bottom:10px;">Uma autoavaliação rápida ajuda a enxergar o padrão e se policiar contra a procrastinação.</div>';
+  html += '<div class="row" style="justify-content:center;gap:8px;margin-bottom:12px;">';
+  html += [1,2,3,4,5].map(v=>{
+    const sel = rev && rev.rating===v;
+    return '<button class="ghost" style="font-size:22px;padding:8px 12px;'+(sel?'border-color:var(--s1);background:var(--surface-2);':'')+'" onclick="setReviewRating('+v+')" title="Nota '+v+'">'+emojis[v-1]+'</button>';
+  }).join('');
+  html += '</div>';
+  html += '<div class="row" style="justify-content:center;gap:8px;align-items:center;margin-bottom:12px;">';
+  html += '<span class="small muted">Procrastinou hoje?</span>';
+  html += '<button class="ghost" style="'+(rev&&rev.procrastinated===true?'border-color:var(--critical);color:var(--critical);':'')+'" onclick="setReviewProcrastinated(true)">Sim</button>';
+  html += '<button class="ghost" style="'+(rev&&rev.procrastinated===false?'border-color:var(--good);color:var(--good-text);':'')+'" onclick="setReviewProcrastinated(false)">Não</button>';
+  html += '</div>';
+  html += '<textarea id="reviewNote" placeholder="O que travou hoje? (opcional)" style="width:100%;min-height:56px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:8px;font-size:13px;font-family:inherit;resize:vertical;" onblur="setReviewNote(this.value)">'+escapeHtml(rev&&rev.note?rev.note:'')+'</textarea>';
+  if(rev && rev.rating){
+    html += '<div class="small muted" style="margin-top:8px;">Salvo às '+new Date(rev.updatedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderNewSessionFlow(){
+  const s = state.subjects[pendingNewSession.subject];
+  let html = '<div class="col">';
+  html += '<div class="row"><span class="dot" style="background:'+subjColor(pendingNewSession.subject)+';"></span><b>'+s.name+'</b></div>';
+  if(s.note) html += '<div class="small muted">'+s.note+'</div>';
+
+  if(pendingNewSession.subject==='hm'){
+    html += '<div class="small" style="margin-top:6px;">Qual especialidade?</div><div class="row">';
+    html += HM_SUBTOPICS.map(x=>'<button class="ghost'+(pendingNewSession.subtopic===x.key?'" style="border-color:var(--s1);color:var(--text-primary);':'"')+' onclick="chooseSubtopic(\''+x.key+'\')">'+x.label+'</button>').join('');
+    html += '</div>';
+  }
+  if(pendingNewSession.subject==='tutoria'){
+    html += '<div class="small" style="margin-top:6px;">Abertura ou fechamento?</div><div class="row">';
+    html += TUTORIA_MODES.map(x=>'<button class="ghost'+(pendingNewSession.mode===x.key?'" style="border-color:var(--s1);color:var(--text-primary);':'"')+' onclick="chooseMode(\''+x.key+'\')">'+x.label+'</button>').join('');
+    html += '</div>';
+  }
+
+  const needsSubtopic = pendingNewSession.subject==='hm' && !pendingNewSession.subtopic;
+  const needsMode = pendingNewSession.subject==='tutoria' && !pendingNewSession.mode;
+  const ready = !needsSubtopic && !needsMode;
+
+  html += '<div class="row" style="margin-top:10px;">';
+  html += '<button class="primary" '+(ready?'':'disabled')+' onclick="confirmStartSession()">▶ Começar agora</button>';
+  html += '<button class="ghost" onclick="cancelNewSessionFlow()">Cancelar</button>';
+  html += '</div></div>';
+  return html;
+}
+
+function renderTopicsEditor(){
+  const topics = state.active.topics;
+  let html = '<div class="topics">';
+  html += topics.map(t=>
+    '<div class="topic'+(t.done?' done':'')+'">' +
+      '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTopic(\''+t.id+'\')">' +
+      '<span class="t" style="flex:1;">'+escapeHtml(t.text)+'</span>' +
+      '<button onclick="removeTopic(\''+t.id+'\')">✕</button>' +
+    '</div>'
+  ).join('');
+  html += '</div>';
+  html += '<div class="add-topic">' +
+    '<input type="text" id="newTopicInput" placeholder="Tópico / rodapé pra decorar…" onkeydown="if(event.key===\'Enter\'){addTopic(this.value);this.value=\'\';}">' +
+    '<button class="ghost" onclick="const i=document.getElementById(\'newTopicInput\');addTopic(i.value);i.value=\'\';">Adicionar</button>' +
+  '</div>';
+  if(topics.length){
+    const done = topics.filter(t=>t.done).length;
+    html += '<div class="small muted" style="margin-top:6px;">'+done+'/'+topics.length+' concluídos</div>';
+  }
+  return html;
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderSemana(){
+  const dk = todayKey();
+  let html = '<div class="card" style="overflow-x:auto;"><h2>Grade da semana</h2>';
+  html += '<table class="tt"><thead><tr>';
+  html += DAY_ORDER.map(d=>'<th class="'+(d===dk?'today-col':'')+'">'+DAY_NAMES[d]+'</th>').join('');
+  html += '</tr></thead><tbody><tr>';
+  html += DAY_ORDER.map(d=>{
+    const cellStyle = d===dk ? 'today-col' : '';
+    const cells = (SCHEDULE[d]||[]).map(slot=>{
+      const cls = slot.type==='livre' ? 'slot livre' : 'slot';
+      const style = slot.type==='livre' ? '' : 'background:var(--surface-2);';
+      return '<div class="'+cls+'" style="'+style+'"><b>'+slot.start+(slot.end&&slot.end!=='—'?'–'+slot.end:'')+'</b><br>'+slot.label+'</div>';
+    }).join('');
+    return '<td class="'+cellStyle+'">'+cells+'</td>';
+  }).join('');
+  html += '</tr></tbody></table></div>';
+
+  html += '<div class="card"><h2>Foco recomendado por dia</h2>';
+  html += DAY_ORDER.map(d=>{
+    let inner = (FOCUS[d]||[]).map(f=>{
+      const s = state.subjects[f.subject];
+      let extra = '';
+      if(f.subtopic){ const x=HM_SUBTOPICS.find(h=>h.key===f.subtopic); if(x) extra=x.label; }
+      if(f.mode){ const x=TUTORIA_MODES.find(h=>h.key===f.mode); if(x) extra=x.label; }
+      return '<div class="focus-item"><span class="dot" style="background:'+subjColor(f.subject)+';"></span>' +
+        '<div class="txt"><b>'+s.name+(extra?' · '+extra:'')+'</b><br>'+f.note+'</div></div>';
+    }).join('');
+    return '<h3 style="margin-top:14px;">'+DAY_FULL[d]+(d===dk?' · hoje':'')+'</h3>' + inner;
+  }).join('');
+  html += '</div>';
+  return html;
+}
+
+function renderProgresso(){
+  const mins = weeklyMinutesBySubject();
+  const fraction = weekdayProgressFraction();
+  let html = '<div class="card"><h2>Semana atual</h2>';
+  html += Object.keys(state.subjects).sort((a,b)=>state.subjects[a].priority-state.subjects[b].priority).map(k=>{
+    const s = state.subjects[k];
+    const actual = mins[k]||0;
+    const target = s.weeklyTargetMin || 1;
+    const pct = Math.min(100, Math.round(actual/target*100));
+    const expected = target*fraction;
+    let statusColor = 'var(--good)';
+    if(actual < expected*0.5) statusColor = 'var(--critical)';
+    else if(actual < expected*0.9) statusColor = 'var(--warning)';
+    return '<div class="subject-row">' +
+      '<div class="label" style="color:'+subjColor(k)+';">'+s.short+'</div>' +
+      '<div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+statusColor+';"></div></div></div>' +
+      '<div class="stat">'+fmtDuration(actual*60000)+' / '+fmtDuration(target*60000)+'</div>' +
+    '</div>';
+  }).join('');
+  html += '</div>';
+
+  html += renderReviewTrend();
+
+  html += '<div class="card"><h2>Últimos 35 dias</h2>';
+  html += renderHeatmap();
+  html += '</div>';
+
+  html += '<div class="card"><h2>Histórico de sessões</h2>';
+  if(!state.sessions.length){
+    html += '<div class="muted small">Nenhuma sessão registrada ainda. Comece uma na aba Hoje.</div>';
+  } else {
+    html += state.sessions.slice(0,60).map(rec=>{
+      const lbl = subjLabel(rec);
+      const date = new Date(rec.endedAt);
+      const dateStr = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      const doneTopics = rec.topics.filter(t=>t.done).length;
+      return '<div class="hist-item">' +
+        '<span class="dot" style="background:'+subjColor(rec.subject)+';"></span>' +
+        '<div class="meta">' +
+          '<div class="l1">'+lbl.name+(lbl.extra?' · '+lbl.extra:'')+(rec.flagged?' <span class="flag">⚠ auto-encerrada</span>':'')+'</div>' +
+          '<div class="l2">'+dateStr+(rec.topics.length?' · '+doneTopics+'/'+rec.topics.length+' tópicos':'')+'</div>' +
+        '</div>' +
+        '<div class="dur">'+fmtDuration(rec.durationMs)+'</div>' +
+        '<button class="ghost" onclick="deleteSession(\''+rec.id+'\')">✕</button>' +
+      '</div>';
+    }).join('');
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderReviewTrend(){
+  const days = [];
+  const today = new Date();
+  for(let i=13;i>=0;i--){
+    const d = new Date(today);
+    d.setDate(d.getDate()-i);
+    days.push({key: localDateKey(d), d, rev: state.dailyReviews[localDateKey(d)]||null});
+  }
+  const rated = days.filter(x=>x.rev && x.rev.rating);
+
+  let html = '<div class="card"><h2>Autoavaliação — últimos 14 dias</h2>';
+  if(!rated.length){
+    html += '<div class="muted small">Ainda sem avaliações. Registre como foi seu dia na aba Hoje.</div></div>';
+    return html;
+  }
+
+  const avg = rated.reduce((a,x)=>a+x.rev.rating,0)/rated.length;
+  const procCount = rated.filter(x=>x.rev.procrastinated===true).length;
+
+  const W=700, H=140, padX=20, padY=18;
+  const stepX = days.length>1 ? (W-2*padX)/(days.length-1) : 0;
+  const yFor = v => H-padY - (v-1)/4*(H-2*padY);
+
+  let pathD = '';
+  const pts = days.map((x,i)=>{
+    if(!x.rev || !x.rev.rating) return null;
+    return {x: padX+i*stepX, y: yFor(x.rev.rating), v:x.rev.rating, proc:x.rev.procrastinated, key:x.key};
+  });
+  pts.forEach(p=>{
+    if(!p) return;
+    pathD += (pathD===''?'M':'L') + p.x.toFixed(1)+','+p.y.toFixed(1)+' ';
+  });
+
+  let svg = '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;">';
+  for(let v=1; v<=5; v++){
+    const y = yFor(v);
+    svg += '<line x1="'+padX+'" y1="'+y+'" x2="'+(W-padX)+'" y2="'+y+'" stroke="var(--gridline)" stroke-width="1"/>';
+  }
+  svg += '<path d="'+pathD.trim()+'" fill="none" stroke="var(--s1)" stroke-width="2"/>';
+  pts.forEach(p=>{
+    if(!p) return;
+    const color = p.proc===true ? 'var(--critical)' : (p.proc===false ? 'var(--good)' : 'var(--s1)');
+    const label = p.key+' · nota '+p.v+(p.proc===true?' · procrastinou':(p.proc===false?' · sem procrastinar':''));
+    svg += '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4" fill="'+color+'"><title>'+label+'</title></circle>';
+  });
+  svg += '</svg>';
+
+  html += svg;
+  html += '<div class="row" style="justify-content:space-between;margin-top:8px;">' +
+    '<span class="small muted">Média: '+avg.toFixed(1)+'/5 · '+rated.length+' dia'+(rated.length===1?'':'s')+' avaliado'+(rated.length===1?'':'s')+'</span>' +
+    '<span class="small muted"><span class="dot" style="background:var(--critical);width:8px;height:8px;"></span> procrastinou em '+procCount+'</span>' +
+  '</div>';
+  html += '</div>';
+  return html;
+}
+
+function renderHeatmap(){
+  const totals = dailyTotals();
+  const days = [];
+  const today = new Date();
+  for(let i=34;i>=0;i--){
+    const d = new Date(today);
+    d.setDate(d.getDate()-i);
+    const key = localDateKey(d);
+    const ms = totals[key]||0;
+    let bucket = 0;
+    if(ms>=180*60000) bucket=4;
+    else if(ms>=90*60000) bucket=3;
+    else if(ms>=30*60000) bucket=2;
+    else if(ms>0) bucket=1;
+    days.push('<div class="heat-cell h'+bucket+'" title="'+key+' · '+fmtDuration(ms)+'"></div>');
+  }
+  return '<div class="heat-grid">'+days.join('')+'</div>' +
+    '<div class="small muted" style="margin-top:8px;">Cada quadrado é um dia (mais escuro = mais tempo estudado).</div>';
+}
+
+function renderConfig(){
+  let html = '<div class="card"><h2>Metas semanais (horas)</h2>';
+  html += Object.keys(state.subjects).map(k=>{
+    const s = state.subjects[k];
+    return '<label class="field"><span><span class="dot" style="background:'+subjColor(k)+';margin-right:6px;"></span>'+s.name+'</span>' +
+      '<input type="number" step="0.5" min="0" value="'+(s.weeklyTargetMin/60)+'" onchange="updateTarget(\''+k+'\', this.value)"></label>';
+  }).join('');
+  html += '</div>';
+
+  html += '<div class="card"><h2>Check-ins de foco</h2>';
+  html += '<label class="field"><span>Perguntar "ainda estudando?" a cada (min)</span><input type="number" min="1" value="'+state.settings.checkInMinutes+'" onchange="updateSetting(\'checkInMinutes\', this.value)"></label>';
+  html += '<label class="field"><span>Encerrar sozinho se não responder em (min)</span><input type="number" min="1" value="'+state.settings.graceMinutes+'" onchange="updateSetting(\'graceMinutes\', this.value)"></label>';
+  html += '<label class="field"><span>Som no check-in</span><button class="ghost" onclick="toggleSound()">'+(state.settings.soundOn?'🔊 Ligado':'🔇 Desligado')+'</button></label>';
+  const permStatus = typeof Notification==='undefined' ? 'não suportado' : Notification.permission;
+  html += '<label class="field"><span>Notificações do navegador ('+permStatus+')</span><button class="ghost" onclick="requestNotifPermission()">Ativar</button></label>';
+  html += '</div>';
+
+  html += '<div class="card"><h2>Dados</h2>';
+  html += '<div class="small muted" style="margin-bottom:10px;">Tudo fica salvo só neste navegador (localStorage), neste arquivo. Nada é enviado pra internet.</div>';
+  html += '<button class="danger" onclick="resetAll()">Apagar todos os dados</button>';
+  html += '</div>';
+  return html;
+}
+
+/* ---------- init ---------- */
+
+function init(){
+  if(state.ui.theme) document.documentElement.setAttribute('data-theme', state.ui.theme);
+
+  if(state.active && state.active.status==='running'){
+    const now = Date.now();
+    const sinceCheck = now - state.active.lastCheckInTs;
+    const checkInMs = state.settings.checkInMinutes*60000;
+    const graceMs = state.settings.graceMinutes*60000;
+    if(sinceCheck > checkInMs + graceMs){
+      const cutoff = state.active.lastCheckInTs;
+      finishSession(cutoff, {flagged:true, note:'Encerrada automaticamente — o app ficou fechado por muito tempo.'});
+    } else if(sinceCheck > checkInMs){
+      issueCheckIn();
+    }
+  }
+
+  window.addEventListener('storage', e=>{
+    if(e.key===STORAGE_KEY){ state = loadState(); render(); }
+  });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) heartbeat(); });
+
+  setInterval(heartbeat, 10000);
+  setInterval(updateLiveClock, 1000);
+
+  render();
+}
+
+init();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
