@@ -296,8 +296,9 @@ const TUTORIA_MODES = [
 ];
 
 const DAY_ORDER = ['seg','ter','qua','qui','sex'];
-const DAY_NAMES = {seg:'Segunda', ter:'Terça', qua:'Quarta', qui:'Quinta', sex:'Sexta'};
-const DAY_FULL  = {seg:'Segunda-feira', ter:'Terça-feira', qua:'Quarta-feira', qui:'Quinta-feira', sex:'Sexta-feira'};
+const DAY_ORDER_ALL = ['seg','ter','qua','qui','sex','sab','dom'];
+const DAY_NAMES = {seg:'Segunda', ter:'Terça', qua:'Quarta', qui:'Quinta', sex:'Sexta', sab:'Sábado', dom:'Domingo'};
+const DAY_FULL  = {seg:'Segunda-feira', ter:'Terça-feira', qua:'Quarta-feira', qui:'Quinta-feira', sex:'Sexta-feira', sab:'Sábado', dom:'Domingo'};
 
 const SCHEDULE = {
   seg: [
@@ -325,32 +326,52 @@ const SCHEDULE = {
 
 const FOCUS = {
   seg: [
-    {subject:'morfo', note:'Revisar o que rolou na aula de hoje (Anatomia/Histologia) enquanto está fresco.'},
-    {subject:'pi', note:'Revisar Práticas Integradas do período da manhã.'},
-    {subject:'piesf', note:'Fixar o conteúdo da aula da tarde antes de esquecer.'}
+    {time:'11:40–12:20', subject:'morfo', note:'Revisar o que rolou na aula de hoje (Anatomia/Histologia) enquanto está fresco.'},
+    {time:'12:20–13:00', subject:'pi', note:'Revisar Práticas Integradas do período da manhã.'},
+    {time:'16:40–17:10', subject:'piesf', note:'Fixar o conteúdo da aula da tarde antes de esquecer.'},
+    {time:'19:00–19:40', subject:'hm', subtopic:'cardiopneumo', note:'Toque diário em Dora. Decoreba não pode ficar um dia sem revisão.'},
+    {time:'19:50–20:20', subject:'tutoria', mode:'abertura', note:'Leitura prévia leve do tema da abertura de amanhã. Só chegar sabendo do assunto, não precisa aprofundar.'}
   ],
   ter: [
-    {subject:'tutoria', mode:'abertura', note:'Antes da aula: só uma leitura prévia leve do tema. Não precisa aprofundar hoje.'},
-    {subject:'hm', subtopic:'gineco', note:'Depois da aula de Ginecologia: revisar e já ir decorando os pontos-chave.'},
-    {subject:'tutoria', mode:'fechamento', note:'Se sobrar tempo à tarde (13h–14h40 livre): adiantar o aprofundamento pro fechamento de sexta.'}
+    {time:'13:00–13:40', subject:'hm', subtopic:'gineco', note:'Ler o conteúdo antes da aula das 15h.'},
+    {time:'13:40–14:20', subject:'hm', subtopic:'cardiopneumo', note:'Toque diário em Dora.'},
+    {time:'16:40–17:10', subject:'hm', subtopic:'gineco', note:'Aula acabou de sair: revisar e já ir decorando os pontos-chave enquanto está fresco.'},
+    {time:'19:00–20:00', subject:'tutoria', mode:'fechamento', note:'Começar a aprofundar objetivo por objetivo — adianta pra não sobrecarregar quarta e quinta.'}
   ],
   qua: [
-    {subject:'tutoria', mode:'fechamento', note:'Dia livre inteiro — é o principal dia pra aprofundar o que você vai apresentar na sexta.'},
-    {subject:'hm', subtopic:'cardiopneumo', note:'Aproveite o dia livre pra decorar HM com calma, principalmente o conteúdo da Profª Dora.'},
-    {subject:'piesf', note:'Colocar em dia.'},
-    {subject:'morfo', note:'Colocar em dia.'},
-    {subject:'pi', note:'Colocar em dia.'}
+    {time:'08:00–09:30', subject:'tutoria', mode:'fechamento', note:'Dia livre inteiro — aprofundar os primeiros objetivos, fonte na mão.'},
+    {time:'09:45–11:00', subject:'hm', subtopic:'cardiopneumo', note:'Matéria nova + decorar o rodapé (valores, exceções, nomes próprios).'},
+    {time:'11:15–12:00', subject:'hm', subtopic:'pediatria', note:'Revisar/adiantar Pediatria.'},
+    {time:'14:00–15:15', subject:'tutoria', mode:'fechamento', note:'Continuar os objetivos restantes do fechamento.'},
+    {time:'15:30–16:30', subject:'hm', subtopic:'cardiopneumo', note:'Refazer o roteiro em voz alta, do zero, sem olhar o resumo.'},
+    {time:'16:45–17:15', subject:'piesf', note:'Colocar em dia.'},
+    {time:'16:45–17:15', subject:'morfo', note:'Colocar em dia.'},
+    {time:'16:45–17:15', subject:'pi', note:'Colocar em dia.'}
   ],
   qui: [
-    {subject:'tutoria', mode:'fechamento', note:'Última chance de aprofundar antes da apresentação de amanhã — capriche.'},
-    {subject:'hm', subtopic:'cardiopneumo', note:'Depois da aula da Profª Dora: revisão pesada e decoreba enquanto está fresco na cabeça (ela cobra "rodapé de livro").'},
-    {subject:'hm', subtopic:'pediatria', note:'Revisar a aula de Pediatria da Profª Daniela.'}
+    {time:'08:00–09:15', subject:'tutoria', mode:'fechamento', note:'Revisão progressiva do que já foi estudado — hoje não é pra estudar coisa nova, é pra consolidar.'},
+    {time:'09:30–10:30', subject:'hm', subtopic:'cardiopneumo', note:'Continuar a decoreba do que ainda falta.'},
+    {time:'10:45–11:45', subject:'hm', subtopic:'pediatria', note:'Última revisão antes da aula da Profª Daniela.'},
+    {time:'16:45–17:30', subject:'hm', subtopic:'cardiopneumo', note:'Aula da Dora acabou de sair: decoreba pesada enquanto está fresco (ela cobra "rodapé de livro").'},
+    {time:'19:00–19:30', subject:'tutoria', mode:'fechamento', note:'Só revisão leve. Se já estudou tudo nos dias anteriores, isso é tudo que deveria faltar — sem virar a madrugada.'}
   ],
   sex: [
-    {subject:'tutoria', mode:'fechamento', note:'Reforço final antes da apresentação, se precisar.'},
-    {subject:'piesf', note:'Tarde livre: colocar as matérias "menores" em dia.'},
-    {subject:'morfo', note:'Tarde livre: colocar em dia.'},
-    {subject:'pi', note:'Tarde livre: colocar em dia.'}
+    {time:'13:00–13:50', subject:'piesf', note:'Tarde livre: colocar em dia.'},
+    {time:'14:00–14:50', subject:'morfo', note:'Tarde livre: colocar em dia.'},
+    {time:'15:00–15:50', subject:'pi', note:'Tarde livre: colocar em dia.'},
+    {time:'16:00–16:40', subject:'hm', subtopic:'cardiopneumo', note:'Revisão leve pra não perder o ritmo até segunda.'}
+  ],
+  sab: [
+    {time:'09:00–10:00', subject:'morfo', note:'Adiantar o conteúdo da semana que vem — evita ter que virar a madrugada de domingo pra segunda.'},
+    {time:'10:15–11:15', subject:'pi', note:'Adiantar o conteúdo da semana que vem.'},
+    {time:'15:00–16:00', subject:'hm', subtopic:'cardiopneumo', note:'Aprofundar com calma, sem a pressão da aula.'}
+  ],
+  dom: [
+    {time:'09:00–10:00', subject:'hm', subtopic:'cardiopneumo', note:'Continuar aprofundando / decoreba.'},
+    {time:'10:15–11:00', subject:'morfo', note:'Terminar de adiantar pra segunda.'},
+    {time:'11:00–11:45', subject:'pi', note:'Terminar de adiantar pra segunda.'},
+    {time:'11:45–12:15', subject:'piesf', note:'Colocar em dia.'},
+    {time:'19:00–19:30', subject:'geral', note:'Olhar a semana que vem e ajustar o plano.'}
   ]
 };
 
@@ -374,6 +395,7 @@ function defaultState(){
     sessions: [],
     dailyReviews: {},
     tasks: [],
+    blocoChecks: {},
     ui: {tab:'hoje', theme:null}
   };
 }
@@ -398,6 +420,7 @@ function loadState(){
   merged.sessions = raw.sessions || [];
   merged.dailyReviews = raw.dailyReviews || {};
   merged.tasks = raw.tasks || [];
+  merged.blocoChecks = raw.blocoChecks || {};
   return merged;
 }
 
@@ -436,6 +459,12 @@ function todayKey(){
   const idx = d.getDay(); // 0 sun .. 6 sat
   const map = {1:'seg',2:'ter',3:'qua',4:'qui',5:'sex'};
   return map[idx] || null;
+}
+function todayKeyAny(){
+  const d = new Date();
+  const idx = d.getDay(); // 0 sun .. 6 sat
+  const map = {0:'dom',1:'seg',2:'ter',3:'qua',4:'qui',5:'sex',6:'sab'};
+  return map[idx];
 }
 function weekStart(d=new Date()){
   const dt = new Date(d);
@@ -955,7 +984,7 @@ function renderHoje(){
     '</div>';
   }
 
-  html += '<div class="card"><h2>Hoje · ' + (dk?DAY_FULL[dk]:'Fim de semana') + '</h2>';
+  html += '<div class="card"><h2>Hoje · ' + DAY_FULL[todayKeyAny()] + '</h2>';
   if(dk){
     html += (SCHEDULE[dk]||[]).map(slot=>{
       const cls = slot.type==='livre' ? 'slot livre' : 'slot';
@@ -967,21 +996,12 @@ function renderHoje(){
   }
   html += '</div>';
 
-  const focusList = dk ? (FOCUS[dk]||[]) : [
-    {subject:'tutoria', mode:'fechamento', note:'Aproveitar o fim de semana pra aprofundar Tutoria e HM sem a correria da semana.'},
-    {subject:'hm', subtopic:'cardiopneumo', note:'Bom momento pra decorar o conteúdo da Profª Dora com calma.'}
-  ];
-  html += '<div class="card"><h2>Sugestão de foco de hoje</h2>';
-  html += focusList.map(f=>{
-    const s = state.subjects[f.subject];
-    let extra = '';
-    if(f.subtopic){ const x=HM_SUBTOPICS.find(h=>h.key===f.subtopic); if(x) extra=x.label; }
-    if(f.mode){ const x=TUTORIA_MODES.find(h=>h.key===f.mode); if(x) extra=x.label; }
-    return '<div class="focus-item">' +
-      '<span class="dot" style="background:'+subjColor(f.subject)+';"></span>' +
-      '<div class="txt"><b>'+s.name+(extra?' · '+extra:'')+'</b><br>'+f.note+'</div>' +
-    '</div>';
-  }).join('');
+  const focusList = FOCUS[todayKeyAny()] || [];
+  html += '<div class="card"><h2>Blocos de estudo de hoje</h2>';
+  html += '<div class="small muted" style="margin-bottom:8px;">Horários sugeridos — marque o que já foi feito. É só um planejamento pessoal, não conta pra estatística de minutos.</div>';
+  html += focusList.length
+    ? focusList.map((f,idx)=>renderFocusItem(f, idx, todayFullKey())).join('')
+    : '<div class="muted small">Nenhum bloco sugerido pra hoje.</div>';
   html += '</div>';
 
   html += '<div class="card"><h2>Sessão de estudo</h2>';
@@ -1087,6 +1107,34 @@ function escapeHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function blocoCheckKey(dateKey, idx){ return dateKey+'|'+idx; }
+function toggleBlocoCheck(key){
+  state.blocoChecks[key] = !state.blocoChecks[key];
+  saveState(); render();
+}
+function renderFocusItem(f, idx, checkDateKey){
+  const isGeral = !state.subjects[f.subject];
+  const name = isGeral ? 'Organização' : state.subjects[f.subject].name;
+  const color = isGeral ? 'var(--text-muted)' : subjColor(f.subject);
+  let extra = '';
+  if(f.subtopic){ const x=HM_SUBTOPICS.find(h=>h.key===f.subtopic); if(x) extra=x.label; }
+  if(f.mode){ const x=TUTORIA_MODES.find(h=>h.key===f.mode); if(x) extra=x.label; }
+  const timeBadge = f.time ? '<span class="badge" style="margin-right:6px;">'+f.time+'</span>' : '';
+  let checkbox = '', done = false;
+  if(checkDateKey){
+    const key = blocoCheckKey(checkDateKey, idx);
+    done = !!state.blocoChecks[key];
+    checkbox = '<input type="checkbox" '+(done?'checked':'')+' onchange="toggleBlocoCheck(\''+key+'\')" style="margin-top:4px;flex:0 0 auto;">';
+  }
+  return '<div class="focus-item">' +
+    checkbox +
+    '<span class="dot" style="background:'+color+';"></span>' +
+    '<div class="txt" style="'+(done?'text-decoration:line-through;color:var(--text-muted);':'')+'">' +
+      timeBadge + '<b>'+name+(extra?' · '+extra:'')+'</b><br>'+f.note +
+    '</div>' +
+  '</div>';
+}
+
 function renderSemana(){
   const dk = todayKey();
   let html = '<div class="card" style="overflow-x:auto;"><h2>Grade da semana</h2>';
@@ -1104,17 +1152,11 @@ function renderSemana(){
   }).join('');
   html += '</tr></tbody></table></div>';
 
-  html += '<div class="card"><h2>Foco recomendado por dia</h2>';
-  html += DAY_ORDER.map(d=>{
-    let inner = (FOCUS[d]||[]).map(f=>{
-      const s = state.subjects[f.subject];
-      let extra = '';
-      if(f.subtopic){ const x=HM_SUBTOPICS.find(h=>h.key===f.subtopic); if(x) extra=x.label; }
-      if(f.mode){ const x=TUTORIA_MODES.find(h=>h.key===f.mode); if(x) extra=x.label; }
-      return '<div class="focus-item"><span class="dot" style="background:'+subjColor(f.subject)+';"></span>' +
-        '<div class="txt"><b>'+s.name+(extra?' · '+extra:'')+'</b><br>'+f.note+'</div></div>';
-    }).join('');
-    return '<h3 style="margin-top:14px;">'+DAY_FULL[d]+(d===dk?' · hoje':'')+'</h3>' + inner;
+  const fk = todayKeyAny();
+  html += '<div class="card"><h2>Blocos de estudo por dia</h2>';
+  html += DAY_ORDER_ALL.map(d=>{
+    let inner = (FOCUS[d]||[]).map((f,idx)=>renderFocusItem(f, idx, null)).join('');
+    return '<h3 style="margin-top:14px;">'+DAY_FULL[d]+(d===fk?' · hoje':'')+'</h3>' + inner;
   }).join('');
   html += '</div>';
   return html;
