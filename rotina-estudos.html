@@ -629,18 +629,19 @@ function setReviewNote(text){
 
 /* ---------- pending tasks ---------- */
 
-function addTask(text, subject, dueDate){
+function addTask(text, subject, dueDate, dueTime){
   const t = (text||'').trim();
   if(!t) return;
-  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, done:false, createdAt:Date.now()});
+  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, dueTime: (dueDate&&dueTime)||null, done:false, createdAt:Date.now()});
   saveState(); render();
 }
 function submitNewTask(){
   const textEl = document.getElementById('taskTextInput');
   const subjEl = document.getElementById('taskSubjectSelect');
   const dueEl = document.getElementById('taskDueInput');
+  const dueTimeEl = document.getElementById('taskDueTimeInput');
   if(!textEl || !textEl.value.trim()) return;
-  addTask(textEl.value, subjEl.value||null, dueEl.value||null);
+  addTask(textEl.value, subjEl.value||null, dueEl.value||null, dueTimeEl.value||null);
 }
 function toggleTaskDone(id){
   const t = state.tasks.find(x=>x.id===id);
@@ -651,24 +652,52 @@ function deleteTask(id){
   state.tasks = state.tasks.filter(x=>x.id!==id);
   saveState(); render();
 }
+function dueDateTime(t){
+  if(!t.dueDate) return null;
+  return new Date(t.dueDate+'T'+(t.dueTime||'23:59')+':00');
+}
 function sortTasksByDue(a,b){
-  if(a.dueDate && b.dueDate) return a.dueDate<b.dueDate?-1:(a.dueDate>b.dueDate?1:0);
-  if(a.dueDate) return -1;
-  if(b.dueDate) return 1;
+  const da = dueDateTime(a), db = dueDateTime(b);
+  if(da && db) return da-db;
+  if(da) return -1;
+  if(db) return 1;
   return b.createdAt - a.createdAt;
 }
-function daysUntil(dueDate){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const due = new Date(dueDate+'T00:00:00');
-  return Math.round((due-today)/86400000);
+function computeDueInfo(t){
+  const dt = dueDateTime(t);
+  if(!dt) return null;
+  const diffMs = dt - new Date();
+  const overdue = diffMs < 0;
+  const absMs = Math.abs(diffMs);
+  const totalMin = Math.floor(absMs/60000);
+  const days = Math.floor(totalMin/1440);
+  const hours = Math.floor((totalMin%1440)/60);
+  const mins = totalMin%60;
+  let txt;
+  if(days>0) txt = days+'d '+hours+'h';
+  else if(hours>0) txt = hours+'h '+mins+'min';
+  else txt = mins+'min';
+  let cls = 'badge';
+  if(overdue) cls = 'badge hot';
+  else if(absMs<=3*3600*1000) cls = 'badge hot';
+  else if(absMs<=24*3600*1000) cls = 'badge warn';
+  const label = overdue ? ('atrasada há '+txt) : ('faltam '+txt);
+  return {cls, label};
 }
-function dueBadge(dueDate){
-  const diff = daysUntil(dueDate);
-  if(diff<0) return '<span class="badge hot">atrasada há '+Math.abs(diff)+'d</span>';
-  if(diff===0) return '<span class="badge hot">vence hoje</span>';
-  if(diff===1) return '<span class="badge warn">vence amanhã</span>';
-  if(diff<=3) return '<span class="badge warn">faltam '+diff+'d</span>';
-  return '<span class="badge">faltam '+diff+'d</span>';
+function dueBadgeHtml(t){
+  const info = computeDueInfo(t);
+  if(!info) return '';
+  return '<span class="'+info.cls+'" data-due-task="'+t.id+'">'+info.label+'</span>';
+}
+function updateTaskCountdowns(){
+  document.querySelectorAll('[data-due-task]').forEach(el=>{
+    const t = state.tasks.find(x=>x.id===el.getAttribute('data-due-task'));
+    if(!t) return;
+    const info = computeDueInfo(t);
+    if(!info) return;
+    el.className = info.cls;
+    el.textContent = info.label;
+  });
 }
 
 /* ---------- check-in / notification engine ---------- */
@@ -842,6 +871,7 @@ function render(){
     '<div class="wrap" id="mainWrap">' + renderTab() + '</div>' +
     renderCheckInModal();
   updateLiveClock();
+  updateTaskCountdowns();
 }
 
 function renderHeader(){
@@ -918,11 +948,13 @@ function renderTaskItem(t){
   const subj = t.subject && state.subjects[t.subject] ? state.subjects[t.subject] : null;
   const color = subj ? subjColor(t.subject) : 'var(--text-muted)';
   const label = subj ? subj.short : 'Geral';
+  const prazoTxt = t.dueDate ? (new Date(t.dueDate+'T00:00:00').toLocaleDateString('pt-BR')+(t.dueTime?' às '+t.dueTime:'')) : '';
   return '<div class="task-item">' +
     '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTaskDone(\''+t.id+'\')">' +
     '<span class="dot" style="background:'+color+';"></span>' +
     '<div class="txt'+(t.done?' done':'')+'"><b>'+label+'</b> — '+escapeHtml(t.text)+
-      (t.dueDate && !t.done ? ' ' + dueBadge(t.dueDate) : '') +
+      (t.dueDate ? '<br><span class="small muted">prazo: '+prazoTxt+'</span>' : '') +
+      (t.dueDate && !t.done ? ' ' + dueBadgeHtml(t) : '') +
     '</div>' +
     '<button class="del" onclick="deleteTask(\''+t.id+'\')">✕</button>' +
   '</div>';
@@ -931,7 +963,7 @@ function renderTaskItem(t){
 function renderPendingTasksWidget(){
   const pending = state.tasks.filter(t=>!t.done).sort(sortTasksByDue);
   if(!pending.length) return '';
-  const urgent = pending.filter(t=>t.dueDate && daysUntil(t.dueDate)<=2);
+  const urgent = pending.filter(t=>t.dueDate && (dueDateTime(t)-new Date())<=2*86400000);
   const show = (urgent.length ? urgent : pending).slice(0,4);
   return '<div class="card">' +
     '<div class="row" style="justify-content:space-between;">' +
@@ -949,7 +981,8 @@ function renderTarefas(){
   html += '<select id="taskSubjectSelect"><option value="">Geral</option>' +
     Object.keys(state.subjects).map(k=>'<option value="'+k+'">'+state.subjects[k].name+'</option>').join('') +
   '</select>';
-  html += '<input type="date" id="taskDueInput">';
+  html += '<input type="date" id="taskDueInput" title="Data do prazo">';
+  html += '<input type="time" id="taskDueTimeInput" title="Horário do prazo (opcional)">';
   html += '<button class="primary" onclick="submitNewTask()">+ Adicionar</button>';
   html += '</div></div></div>';
 
@@ -1338,6 +1371,7 @@ function init(){
 
   setInterval(heartbeat, 10000);
   setInterval(updateLiveClock, 1000);
+  setInterval(updateTaskCountdowns, 30000);
 
   render();
 }
