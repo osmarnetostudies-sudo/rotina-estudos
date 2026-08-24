@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#2a78d6"/>
-  <text x="256" y="291" font-family="system-ui, Segoe UI, sans-serif" font-weight="700" font-size="184" fill="#ffffff" text-anchor="middle">R&amp;E</text>
+  <rect width="512" height="512" rx="112" fill="#0b1512"/>
+  <path d="M 32 256 L 132 256 L 162 256 L 188 178 L 210 348 L 240 66 L 272 430 L 306 256 L 340 256 L 366 202 L 392 256 L 480 256"
+        fill="none" stroke="#35e07a" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="240" cy="66" r="14" fill="#ff5d78"/>
 </svg>
