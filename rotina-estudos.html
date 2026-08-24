@@ -7,80 +7,85 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
-<meta name="theme-color" content="#2a78d6">
+<meta name="theme-color" content="#1c6fa8">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rotina & Estudos">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     color-scheme: light;
-    --surface-1:      #fcfcfb;
-    --page:           #f9f9f7;
-    --surface-2:      #ffffff;
-    --text-primary:   #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted:     #898781;
-    --gridline:       #e1e0d9;
-    --baseline:       #c3c2b7;
-    --border:         rgba(11,11,11,0.10);
-    --good:           #0ca30c;
-    --good-text:      #006300;
-    --warning:        #fab219;
-    --serious:        #ec835a;
-    --critical:       #d03b3b;
-    --s1: #2a78d6; /* HM - blue */
-    --s2: #eb6834; /* Tutoria - orange */
-    --s3: #1baf7a; /* PIESF - aqua */
-    --s4: #eda100; /* Morfo - yellow */
-    --s5: #e87ba4; /* PI - magenta */
-    --heat-0: #e1e0d9;
-    --heat-1: #b7d3f6;
-    --heat-2: #5598e7;
-    --heat-3: #1c5cab;
-    --heat-4: #0d366b;
+    --surface-1:      #ffffff;
+    --page:           #f3f6f4;
+    --surface-2:      #edf3f0;
+    --text-primary:   #15241f;
+    --text-secondary: #4c5f57;
+    --text-muted:     #8b9c94;
+    --gridline:       #dce7e0;
+    --baseline:       #c2d2c9;
+    --border:         rgba(21,36,31,0.10);
+    --good:           #1e9e6b;
+    --good-text:      #146b49;
+    --warning:        #db9a2c;
+    --serious:        #e0713f;
+    --critical:       #d6314b;
+    --s1: #1c6fa8; /* HM — azul de estetoscópio */
+    --s2: #c97a16; /* Tutoria — âmbar de pasta de prontuário */
+    --s3: #1e9e6b; /* PIESF — verde saúde pública */
+    --s4: #7b4fc7; /* Morfo — roxo de hematoxilina (H&E) */
+    --s5: #c23b7a; /* PI — rosa de eosina (H&E) */
+    --heat-0: #dce7e0;
+    --heat-1: #afd2e7;
+    --heat-2: #5fa3ce;
+    --heat-3: #2c7cae;
+    --heat-4: #164a6e;
+    --display: 'Archivo', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) {
       color-scheme: dark;
-      --surface-1:      #1a1a19;
-      --page:           #0d0d0d;
-      --surface-2:      #232322;
-      --text-primary:   #ffffff;
-      --text-secondary: #c3c2b7;
-      --text-muted:     #898781;
-      --gridline:       #2c2c2a;
-      --baseline:       #383835;
+      --surface-1:      #141c19;
+      --page:           #0b120f;
+      --surface-2:      #1d2622;
+      --text-primary:   #f2f7f5;
+      --text-secondary: #b9c9c1;
+      --text-muted:     #7e9088;
+      --gridline:       #28332d;
+      --baseline:       #37453e;
       --border:         rgba(255,255,255,0.10);
-      --good:           #0ca30c;
-      --good-text:      #0ca30c;
-      --warning:        #fab219;
-      --serious:        #ec835a;
-      --critical:       #d03b3b;
-      --s1: #3987e5;
-      --s2: #d95926;
-      --s3: #199e70;
-      --s4: #c98500;
-      --s5: #d55181;
-      --heat-0: #2c2c2a;
-      --heat-1: #184f95;
-      --heat-2: #256abf;
-      --heat-3: #3987e5;
-      --heat-4: #86b6ef;
+      --good:           #28b57c;
+      --good-text:      #28b57c;
+      --warning:        #e3aa45;
+      --serious:        #e88a5c;
+      --critical:       #e1495f;
+      --s1: #4a9fd6;
+      --s2: #e0932e;
+      --s3: #28b57c;
+      --s4: #9a78e0;
+      --s5: #db5f9b;
+      --heat-0: #28332d;
+      --heat-1: #1e4e68;
+      --heat-2: #2c7cae;
+      --heat-3: #4a9fd6;
+      --heat-4: #9ad0ee;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --surface-1:      #1a1a19;
-    --page:           #0d0d0d;
-    --surface-2:      #232322;
-    --text-primary:   #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted:     #898781;
-    --gridline:       #2c2c2a;
-    --baseline:       #383835;
+    --surface-1:      #141c19;
+    --page:           #0b120f;
+    --surface-2:      #1d2622;
+    --text-primary:   #f2f7f5;
+    --text-secondary: #b9c9c1;
+    --text-muted:     #7e9088;
+    --gridline:       #28332d;
+    --baseline:       #37453e;
     --border:         rgba(255,255,255,0.10);
-    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
-    --heat-0: #2c2c2a; --heat-1: #184f95; --heat-2: #256abf; --heat-3: #3987e5; --heat-4: #86b6ef;
+    --s1: #4a9fd6; --s2: #e0932e; --s3: #28b57c; --s4: #9a78e0; --s5: #db5f9b;
+    --heat-0: #28332d; --heat-1: #1e4e68; --heat-2: #2c7cae; --heat-3: #4a9fd6; --heat-4: #9ad0ee;
   }
 
   *{box-sizing:border-box;}
@@ -88,7 +93,7 @@
   body{
     background:var(--page);
     color:var(--text-primary);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: 'Instrument Sans', system-ui, -apple-system, "Segoe UI", sans-serif;
     -webkit-font-smoothing:antialiased;
   }
   .wrap{max-width:900px;margin:0 auto;padding:16px 16px 80px;}
@@ -100,14 +105,23 @@
     border-bottom:1px solid var(--border);
   }
   .top-inner{
-    max-width:900px;margin:0 auto;padding:12px 16px;
-    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    max-width:900px;margin:0 auto;padding:12px 16px 8px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background-image:
+      linear-gradient(var(--gridline) 1px, transparent 1px),
+      linear-gradient(90deg, var(--gridline) 1px, transparent 1px);
+    background-size:9px 9px;
+    background-position:-1px -1px;
   }
-  .brand{font-weight:700;font-size:17px;flex:0 0 auto;}
+  .brand{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.02em;flex:0 0 auto;display:flex;align-items:center;gap:7px;}
+  .brand .cross{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:6px;background:var(--s1);color:#fff;font-size:13px;flex:0 0 auto;
+  }
   .streak{
-    font-size:13px;color:var(--text-secondary);
+    font-family:var(--mono);font-size:12px;color:var(--text-secondary);
     background:var(--surface-2);border:1px solid var(--border);
-    padding:4px 10px;border-radius:999px;
+    padding:4px 10px;border-radius:999px;white-space:nowrap;
   }
   .spacer{flex:1 1 auto;}
   .icon-btn{
@@ -116,14 +130,25 @@
   }
   .icon-btn:hover{filter:brightness(1.05);}
 
+  .vitals-strip{
+    background:#0b1512;padding:6px 16px 9px;
+  }
+  .vitals-inner{max-width:900px;margin:0 auto;}
+  .vitals-label{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:#6f9b8c;margin:0 0 2px;
+  }
+
   nav.tabs{
     max-width:900px;margin:0 auto;padding:0 16px;
     display:flex;gap:4px;border-bottom:1px solid var(--border);
     overflow-x:auto;
   }
   nav.tabs button{
+    font-family:var(--mono);
     background:none;border:none;color:var(--text-secondary);
-    padding:10px 14px;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;
+    padding:10px 14px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+    cursor:pointer;border-bottom:2px solid transparent;
     white-space:nowrap;
   }
   nav.tabs button.active{color:var(--text-primary);border-bottom-color:var(--s1);font-weight:600;}
@@ -132,8 +157,8 @@
     background:var(--surface-1);border:1px solid var(--border);
     border-radius:14px;padding:16px;margin-bottom:14px;
   }
-  .card h2{margin:0 0 10px;font-size:15px;}
-  .card h3{margin:0 0 8px;font-size:13px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+  .card h2{margin:0 0 10px;font-size:15px;font-family:var(--display);font-weight:700;letter-spacing:-.01em;}
+  .card h3{margin:0 0 8px;font-size:12.5px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono);}
   .muted{color:var(--text-muted);}
   .small{font-size:12px;}
   .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -141,12 +166,12 @@
 
   .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto;}
   .badge{
-    font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);
+    font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);
     color:var(--text-secondary);white-space:nowrap;
   }
   .badge.hot{color:#fff;background:var(--critical);border-color:var(--critical);}
   .badge.good{color:#fff;background:var(--good);border-color:var(--good);}
-  .badge.warn{color:#000;background:var(--warning);border-color:var(--warning);}
+  .badge.warn{color:#1a1200;background:var(--warning);border-color:var(--warning);}
 
   button.subj{
     display:flex;align-items:center;gap:8px;
@@ -178,7 +203,7 @@
 
   .active-bar{
     background:var(--surface-1);border-bottom:1px solid var(--border);
-    position:sticky;top:53px;z-index:19;
+    position:sticky;top:101px;z-index:19;
   }
   .active-bar-inner{
     max-width:900px;margin:0 auto;padding:10px 16px;
@@ -186,7 +211,7 @@
   }
   .clock{
     font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: var(--mono);
   }
   .active-meta{display:flex;flex-direction:column;gap:2px;}
   .active-meta .name{font-weight:600;font-size:14px;}
@@ -228,8 +253,9 @@
   label.field{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--gridline);}
   label.field:last-child{border-bottom:none;}
 
-  .task-item{display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid var(--gridline);font-size:13.5px;}
-  .task-item:last-child{border-bottom:none;}
+  .task-item{display:flex;align-items:flex-start;gap:8px;padding:9px 10px;margin-bottom:6px;border-radius:8px;border-left:3px solid var(--gridline);font-size:13.5px;}
+  .task-item.triage-hot{border-left-color:var(--critical);background:color-mix(in srgb, var(--critical) 6%, transparent);}
+  .task-item.triage-warn{border-left-color:var(--warning);background:color-mix(in srgb, var(--warning) 6%, transparent);}
   .task-item input[type=checkbox]{margin-top:3px;flex:0 0 auto;}
   .task-item .dot{margin-top:5px;}
   .task-item .txt{flex:1;line-height:1.4;}
@@ -874,19 +900,62 @@ function render(){
   updateTaskCountdowns();
 }
 
+function mostUrgentTask(){
+  const pending = state.tasks.filter(t=>!t.done && t.dueDate).sort(sortTasksByDue);
+  return pending[0] || null;
+}
+
+function renderPulseTrace(){
+  const totals = dailyTotals();
+  const days = [];
+  const today = new Date();
+  for(let i=6;i>=0;i--){
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate()-i);
+    days.push(totals[localDateKey(d)] || 0);
+  }
+  const max = Math.max(60*60000, ...days);
+  const W=700, H=44, pad=6, seg=(W-2*pad)/7, base=H-9;
+  let d = 'M '+pad+' '+base;
+  days.forEach((ms,i)=>{
+    const x = pad + i*seg;
+    const frac = Math.min(1, ms/max);
+    if(frac<=0.02){ d += ' L '+(x+seg)+' '+base; return; }
+    const amp = 5 + frac*(base-8);
+    const c = x + seg*0.5;
+    d += ' L '+(c-seg*0.30)+' '+base;
+    d += ' L '+(c-seg*0.12)+' '+(base+amp*0.22);
+    d += ' L '+c+' '+(base-amp);
+    d += ' L '+(c+seg*0.12)+' '+(base+amp*0.26);
+    d += ' L '+(c+seg*0.30)+' '+base;
+    d += ' L '+(x+seg)+' '+base;
+  });
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:32px;display:block;" aria-hidden="true">' +
+    '<path d="'+d+'" fill="none" stroke="#ff5d78" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+  '</svg>';
+}
+
 function renderHeader(){
   const streak = computeStreak();
   const pendingCount = state.tasks.filter(t=>!t.done).length;
+  const urgent = mostUrgentTask();
+  const urgentHtml = (urgent && !urgent.done) ? (function(){
+    const info = computeDueInfo(urgent);
+    return ' · <span data-due-task="'+urgent.id+'" style="font-weight:600;">'+info.label+'</span>';
+  })() : '';
   const tabs = [['hoje','Hoje'],['tarefas','Tarefas'],['semana','Semana'],['progresso','Progresso'],['config','Config']];
   const themeIcon = state.ui.theme==='dark' ? '🌙' : (state.ui.theme==='light' ? '☀️' : '🖥️');
   return (
   '<header class="top"><div class="top-inner">' +
-    '<div class="brand">📚 Rotina & Estudos</div>' +
+    '<div class="brand"><span class="cross">✚</span>Rotina & Estudos</div>' +
     '<div class="streak">🔥 ' + streak + ' dia' + (streak===1?'':'s') + ' seguido' + (streak===1?'':'s') + '</div>' +
-    (pendingCount ? '<button class="streak" style="cursor:pointer;border:1px solid var(--border);" onclick="setTab(\'tarefas\')">📌 '+pendingCount+' pendente'+(pendingCount===1?'':'s')+'</button>' : '') +
+    (pendingCount ? '<button class="streak" style="cursor:pointer;" onclick="setTab(\'tarefas\')">📌 '+pendingCount+' pendente'+(pendingCount===1?'':'s')+urgentHtml+'</button>' : '') +
     '<div class="spacer"></div>' +
     '<button class="icon-btn" onclick="toggleTheme()" title="Tema">' + themeIcon + '</button>' +
   '</div>' +
+  '<div class="vitals-strip"><div class="vitals-inner">' +
+    '<p class="vitals-label">Traçado · últimos 7 dias de estudo</p>' +
+    renderPulseTrace() +
+  '</div></div>' +
   '<nav class="tabs">' +
     tabs.map(t=>'<button class="'+(state.ui.tab===t[0]?'active':'')+'" onclick="setTab(\''+t[0]+'\')">'+t[1]+'</button>').join('') +
   '</nav></header>'
@@ -949,7 +1018,9 @@ function renderTaskItem(t){
   const color = subj ? subjColor(t.subject) : 'var(--text-muted)';
   const label = subj ? subj.short : 'Geral';
   const prazoTxt = t.dueDate ? (new Date(t.dueDate+'T00:00:00').toLocaleDateString('pt-BR')+(t.dueTime?' às '+t.dueTime:'')) : '';
-  return '<div class="task-item">' +
+  const info = !t.done ? computeDueInfo(t) : null;
+  const triageCls = info && info.cls==='badge hot' ? ' triage-hot' : (info && info.cls==='badge warn' ? ' triage-warn' : '');
+  return '<div class="task-item'+triageCls+'">' +
     '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTaskDone(\''+t.id+'\')">' +
     '<span class="dot" style="background:'+color+';"></span>' +
     '<div class="txt'+(t.done?' done':'')+'"><b>'+label+'</b> — '+escapeHtml(t.text)+
