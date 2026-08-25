@@ -14,6 +14,54 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAnkJmq6h-NDIgL1WlhRij5YB7H0MNrIw4",
+    authDomain: "plantao-sync.firebaseapp.com",
+    projectId: "plantao-sync",
+    storageBucket: "plantao-sync.firebasestorage.app",
+    messagingSenderId: "359789272473",
+    appId: "1:359789272473:web:a0e3ed2a769fe07e72c708"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const docRef = code => doc(db, 'sync', code);
+
+  let unsub = null;
+  let pushTimer = null;
+
+  window.__sync = {
+    push(code, deviceId, payload){
+      clearTimeout(pushTimer);
+      pushTimer = setTimeout(() => {
+        setDoc(docRef(code), Object.assign({}, payload, {updatedBy: deviceId, updatedAt: Date.now()}))
+          .catch(err => console.error('sync push failed', err));
+      }, 900);
+    },
+    async join(code){
+      try{
+        const snap = await getDoc(docRef(code));
+        return snap.exists() ? snap.data() : null;
+      }catch(err){ console.error('sync join failed', err); return null; }
+    },
+    subscribe(code, deviceId, onRemote){
+      if(unsub) unsub();
+      unsub = onSnapshot(docRef(code), snap => {
+        if(!snap.exists()) return;
+        const data = snap.data();
+        if(data.updatedBy === deviceId) return;
+        onRemote(data);
+      }, err => console.error('sync subscribe failed', err));
+    },
+    unsubscribe(){
+      if(unsub){ unsub(); unsub = null; }
+    }
+  };
+  window.dispatchEvent(new Event('sync-ready'));
+</script>
 <style>
   :root{
     color-scheme: light;
@@ -422,6 +470,7 @@ function defaultState(){
     dailyReviews: {},
     tasks: [],
     blocoChecks: {},
+    sync: {code:null},
     ui: {tab:'hoje', theme:null}
   };
 }
@@ -447,14 +496,82 @@ function loadState(){
   merged.dailyReviews = raw.dailyReviews || {};
   merged.tasks = raw.tasks || [];
   merged.blocoChecks = raw.blocoChecks || {};
+  merged.sync = Object.assign({code:null}, raw.sync);
   return merged;
 }
 
 function saveState(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if(!applyingRemote && state.sync && state.sync.code && window.__sync){
+    window.__sync.push(state.sync.code, DEVICE_ID, syncPayload());
+  }
 }
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+/* ---------- cross-device sync ---------- */
+
+const SYNC_FIELDS = ['subjects','settings','sessions','dailyReviews','tasks','blocoChecks'];
+let applyingRemote = false;
+
+function getDeviceId(){
+  let id = localStorage.getItem('plantaoDeviceId');
+  if(!id){ id = uid()+uid(); localStorage.setItem('plantaoDeviceId', id); }
+  return id;
+}
+const DEVICE_ID = getDeviceId();
+
+function syncPayload(){
+  const p = {};
+  SYNC_FIELDS.forEach(f=>{ p[f] = state[f]; });
+  return p;
+}
+function handleRemoteSync(data){
+  applyingRemote = true;
+  SYNC_FIELDS.forEach(f=>{ if(data[f]!==undefined) state[f] = data[f]; });
+  saveState();
+  render();
+  applyingRemote = false;
+}
+function genSyncCode(){
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for(let i=0;i<10;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+function createSync(){
+  const code = genSyncCode();
+  state.sync = {code};
+  saveState();
+  if(window.__sync) window.__sync.subscribe(code, DEVICE_ID, handleRemoteSync);
+  render();
+}
+async function joinSync(codeRaw){
+  const code = (codeRaw||'').trim().toUpperCase();
+  if(code.length < 8){ alert('Código inválido — cole o código completo mostrado no outro aparelho.'); return; }
+  if(!window.__sync){ alert('A sincronização ainda está carregando, tenta de novo em alguns segundos.'); return; }
+  const remote = await window.__sync.join(code);
+  applyingRemote = true;
+  state.sync = {code};
+  if(remote) SYNC_FIELDS.forEach(f=>{ if(remote[f]!==undefined) state[f] = remote[f]; });
+  saveState();
+  applyingRemote = false;
+  if(!remote) window.__sync.push(code, DEVICE_ID, syncPayload());
+  window.__sync.subscribe(code, DEVICE_ID, handleRemoteSync);
+  render();
+}
+function stopSync(){
+  if(!confirm('Desativar sincronização neste aparelho? Os dados na nuvem continuam lá — só este aparelho para de sincronizar.')) return;
+  if(window.__sync) window.__sync.unsubscribe();
+  state.sync = {code:null};
+  saveState();
+  render();
+}
+function initSyncIfNeeded(){
+  if(!(state.sync && state.sync.code)) return;
+  if(window.__sync){ window.__sync.subscribe(state.sync.code, DEVICE_ID, handleRemoteSync); }
+  else{ window.addEventListener('sync-ready', initSyncIfNeeded, {once:true}); }
+}
 
 /* ---------- time helpers ---------- */
 
@@ -1410,8 +1527,28 @@ function renderConfig(){
   html += '<label class="field"><span>Notificações do navegador ('+permStatus+')</span><button class="ghost" onclick="requestNotifPermission()">Ativar</button></label>';
   html += '</div>';
 
+  html += '<div class="card"><h2>Sincronização entre aparelhos</h2>';
+  if(state.sync && state.sync.code){
+    html += '<div class="small muted" style="margin-bottom:10px;">Sincronizado. Use este código nos outros aparelhos (Config → colar em "Já tenho um código"):</div>';
+    html += '<div class="row" style="margin-bottom:12px;">' +
+      '<span style="font-family:var(--mono);font-size:16px;letter-spacing:.1em;background:var(--surface-2);padding:8px 12px;border-radius:8px;">'+state.sync.code+'</span>' +
+      '<button class="ghost" onclick="navigator.clipboard.writeText(\''+state.sync.code+'\').then(function(){alert(\'Código copiado!\');})">Copiar</button>' +
+    '</div>';
+    html += '<button class="danger" onclick="stopSync()">Desativar sincronização</button>';
+  } else {
+    html += '<div class="small muted" style="margin-bottom:10px;">Sincronize tarefas, sessões e autoavaliações entre todos os seus aparelhos.</div>';
+    html += '<button class="primary wide" onclick="createSync()" style="margin-bottom:12px;">Criar sincronização neste aparelho</button>';
+    html += '<div class="row"><input type="text" id="joinCodeInput" placeholder="Já tenho um código" style="flex:1;text-transform:uppercase;">' +
+      '<button class="ghost" onclick="joinSync(document.getElementById(\'joinCodeInput\').value)">Entrar</button></div>';
+  }
+  html += '</div>';
+
   html += '<div class="card"><h2>Dados</h2>';
-  html += '<div class="small muted" style="margin-bottom:10px;">Tudo fica salvo só neste navegador (localStorage), neste arquivo. Nada é enviado pra internet.</div>';
+  html += '<div class="small muted" style="margin-bottom:10px;">' +
+    (state.sync && state.sync.code
+      ? 'Sincronizado com a nuvem (Firebase) usando o código acima. Só quem tiver o código consegue ler ou escrever esses dados.'
+      : 'Tudo fica salvo só neste navegador (localStorage), neste arquivo. Nada é enviado pra internet.') +
+    '</div>';
   html += '<button class="danger" onclick="resetAll()">Apagar todos os dados</button>';
   html += '</div>';
   return html;
@@ -1421,6 +1558,7 @@ function renderConfig(){
 
 function init(){
   if(state.ui.theme) document.documentElement.setAttribute('data-theme', state.ui.theme);
+  initSyncIfNeeded();
 
   if(state.active && state.active.status==='running'){
     const now = Date.now();
