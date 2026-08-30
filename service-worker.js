@@ -1,5 +1,5 @@
-const CACHE = 'plantao-v2';
-const ASSETS = ['./rotina-estudos.html', './manifest.json', './icon.svg'];
+const CACHE = 'plantao-v3';
+const ASSETS = ['./rotina-estudos.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
