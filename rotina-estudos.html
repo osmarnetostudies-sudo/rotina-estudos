@@ -309,6 +309,13 @@
   .task-item .txt{flex:1;line-height:1.4;}
   .task-item .txt.done{text-decoration:line-through;color:var(--text-muted);}
   .task-item .del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:0 4px;flex:0 0 auto;}
+  .task-note{
+    display:block;width:100%;margin-top:6px;padding:6px 8px;min-height:30px;
+    background:var(--page);border:1px dashed var(--gridline);border-radius:6px;
+    color:var(--text-secondary);font-size:12.5px;font-family:inherit;resize:vertical;
+  }
+  .task-note:focus{outline:none;border:1px solid var(--s1);color:var(--text-primary);}
+  .task-note::placeholder{color:var(--text-muted);font-style:italic;}
 
   .topics{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
   .topic{display:flex;align-items:center;gap:8px;font-size:13px;}
@@ -775,8 +782,14 @@ function setReviewNote(text){
 function addTask(text, subject, dueDate, dueTime){
   const t = (text||'').trim();
   if(!t) return;
-  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, dueTime: (dueDate&&dueTime)||null, done:false, createdAt:Date.now()});
+  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, dueTime: (dueDate&&dueTime)||null, done:false, notes:'', createdAt:Date.now()});
   saveState(); render();
+}
+function setTaskNote(id, text){
+  const t = state.tasks.find(x=>x.id===id);
+  if(!t) return;
+  t.notes = text;
+  saveState();
 }
 function submitNewTask(){
   const textEl = document.getElementById('taskTextInput');
@@ -1143,6 +1156,7 @@ function renderTaskItem(t){
     '<div class="txt'+(t.done?' done':'')+'"><b>'+label+'</b> — '+escapeHtml(t.text)+
       (t.dueDate ? '<br><span class="small muted">prazo: '+prazoTxt+'</span>' : '') +
       (t.dueDate && !t.done ? ' ' + dueBadgeHtml(t) : '') +
+      '<textarea class="task-note" placeholder="Observação — o que já fez, o que falta..." onblur="setTaskNote(\''+t.id+'\', this.value)">'+escapeHtml(t.notes||'')+'</textarea>' +
     '</div>' +
     '<button class="del" onclick="deleteTask(\''+t.id+'\')">✕</button>' +
   '</div>';
