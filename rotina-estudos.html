@@ -316,6 +316,11 @@
   }
   .task-note:focus{outline:none;border:1px solid var(--s1);color:var(--text-primary);}
   .task-note::placeholder{color:var(--text-muted);font-style:italic;}
+  .add-note-btn{
+    display:inline-block;margin-top:5px;background:none;border:none;padding:0;
+    color:var(--text-muted);font-size:11.5px;font-family:var(--mono);cursor:pointer;
+  }
+  .add-note-btn:hover{color:var(--s1);text-decoration:underline;}
 
   .topics{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
   .topic{display:flex;align-items:center;gap:8px;font-size:13px;}
@@ -484,6 +489,7 @@ function defaultState(){
 
 let state = loadState();
 let pendingNewSession = null; // transient, not persisted
+let openTaskNotes = new Set(); // transient, not persisted
 let titleFlashInterval = null;
 let titleFlashOn = false;
 
@@ -789,7 +795,14 @@ function setTaskNote(id, text){
   const t = state.tasks.find(x=>x.id===id);
   if(!t) return;
   t.notes = text;
-  saveState();
+  if(!text.trim()) openTaskNotes.delete(id);
+  saveState(); render();
+}
+function toggleTaskNoteOpen(id){
+  openTaskNotes.add(id);
+  render();
+  const el = document.querySelector('.task-note[data-task-id="'+id+'"]');
+  if(el) el.focus();
 }
 function submitNewTask(){
   const textEl = document.getElementById('taskTextInput');
@@ -1150,13 +1163,18 @@ function renderTaskItem(t){
   const prazoTxt = t.dueDate ? (new Date(t.dueDate+'T00:00:00').toLocaleDateString('pt-BR')+(t.dueTime?' às '+t.dueTime:'')) : '';
   const info = !t.done ? computeDueInfo(t) : null;
   const triageCls = info && info.cls==='badge hot' ? ' triage-hot' : (info && info.cls==='badge warn' ? ' triage-warn' : '');
+  const hasNote = !!(t.notes && t.notes.trim());
+  const noteOpen = hasNote || openTaskNotes.has(t.id);
+  const noteHtml = noteOpen
+    ? '<textarea class="task-note" data-task-id="'+t.id+'" placeholder="Observação — o que já fez, o que falta..." onblur="setTaskNote(\''+t.id+'\', this.value)">'+escapeHtml(t.notes||'')+'</textarea>'
+    : '<button class="add-note-btn" onclick="toggleTaskNoteOpen(\''+t.id+'\')">+ observação</button>';
   return '<div class="task-item'+triageCls+'">' +
     '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTaskDone(\''+t.id+'\')">' +
     '<span class="dot" style="background:'+color+';"></span>' +
     '<div class="txt'+(t.done?' done':'')+'"><b>'+label+'</b> — '+escapeHtml(t.text)+
       (t.dueDate ? '<br><span class="small muted">prazo: '+prazoTxt+'</span>' : '') +
       (t.dueDate && !t.done ? ' ' + dueBadgeHtml(t) : '') +
-      '<textarea class="task-note" placeholder="Observação — o que já fez, o que falta..." onblur="setTaskNote(\''+t.id+'\', this.value)">'+escapeHtml(t.notes||'')+'</textarea>' +
+      noteHtml +
     '</div>' +
     '<button class="del" onclick="deleteTask(\''+t.id+'\')">✕</button>' +
   '</div>';
