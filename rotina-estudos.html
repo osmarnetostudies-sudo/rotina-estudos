@@ -317,10 +317,12 @@
   .task-note:focus{outline:none;border:1px solid var(--s1);color:var(--text-primary);}
   .task-note::placeholder{color:var(--text-muted);font-style:italic;}
   .add-note-btn{
-    display:inline-block;margin-top:5px;background:none;border:none;padding:0;
-    color:var(--text-muted);font-size:11.5px;font-family:var(--mono);cursor:pointer;
+    display:block;width:fit-content;margin-top:7px;
+    background:var(--surface-2);border:1px solid var(--border);border-radius:999px;
+    padding:4px 12px;color:var(--text-secondary);font-size:11.5px;font-family:var(--mono);
+    letter-spacing:.03em;cursor:pointer;
   }
-  .add-note-btn:hover{color:var(--s1);text-decoration:underline;}
+  .add-note-btn:hover{color:#fff;background:var(--s1);border-color:var(--s1);}
 
   .topics{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
   .topic{display:flex;align-items:center;gap:8px;font-size:13px;}
@@ -1167,7 +1169,7 @@ function renderTaskItem(t){
   const noteOpen = hasNote || openTaskNotes.has(t.id);
   const noteHtml = noteOpen
     ? '<textarea class="task-note" data-task-id="'+t.id+'" placeholder="Observação — o que já fez, o que falta..." onblur="setTaskNote(\''+t.id+'\', this.value)">'+escapeHtml(t.notes||'')+'</textarea>'
-    : '<button class="add-note-btn" onclick="toggleTaskNoteOpen(\''+t.id+'\')">+ observação</button>';
+    : '<button class="add-note-btn" onclick="toggleTaskNoteOpen(\''+t.id+'\')">+ Observação</button>';
   return '<div class="task-item'+triageCls+'">' +
     '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTaskDone(\''+t.id+'\')">' +
     '<span class="dot" style="background:'+color+';"></span>' +
