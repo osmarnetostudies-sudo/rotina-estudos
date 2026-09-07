@@ -889,13 +889,42 @@ function beep(){
     });
   }catch(e){}
 }
-function notifyOS(title, body){
+function notifyOS(title, body, tag){
   if(typeof Notification==='undefined') return;
   if(Notification.permission!=='granted') return;
   try{
-    const n = new Notification(title, {body, tag:'checkin', renotify:true});
+    const n = new Notification(title, {body, tag: tag||'checkin', renotify:true});
     n.onclick = () => { window.focus(); n.close(); };
   }catch(e){}
+}
+
+/* ---------- task deadline reminders ---------- */
+
+const DEADLINE_THRESHOLDS = [1440, 180, 30, 0]; // minutos antes do prazo (0 = venceu)
+function thresholdLabel(min){
+  if(min===0) return 'Prazo vencido';
+  if(min===30) return 'Vence em 30 minutos';
+  if(min===180) return 'Vence em 3 horas';
+  if(min===1440) return 'Vence em 24 horas';
+  return 'Prazo chegando';
+}
+function checkTaskDeadlines(){
+  if(typeof Notification==='undefined' || Notification.permission!=='granted') return;
+  let changed = false;
+  state.tasks.forEach(t=>{
+    if(t.done || !t.dueDate) return;
+    const diffMin = (dueDateTime(t) - Date.now())/60000;
+    t.notifiedThresholds = t.notifiedThresholds || [];
+    const newlyCrossed = DEADLINE_THRESHOLDS.filter(th => diffMin<=th && !t.notifiedThresholds.includes(th));
+    if(newlyCrossed.length){
+      const mostUrgent = Math.min(...newlyCrossed);
+      const subj = t.subject && state.subjects[t.subject] ? state.subjects[t.subject].name : 'Geral';
+      notifyOS(thresholdLabel(mostUrgent), subj+' — '+t.text, 'task-'+t.id+'-'+mostUrgent);
+      t.notifiedThresholds.push(...newlyCrossed);
+      changed = true;
+    }
+  });
+  if(changed) saveState();
 }
 function startTitleFlash(){
   if(titleFlashInterval) return;
@@ -1231,7 +1260,7 @@ function renderHoje(){
 
   if(typeof Notification!=='undefined' && Notification.permission==='default' && !state.settings.notifBannerDismissed){
     html += '<div class="card row" style="justify-content:space-between;">' +
-      '<div class="small">Ative as notificações pra receber os check-ins mesmo se você sair da aba.</div>' +
+      '<div class="small">Ative as notificações pra receber os check-ins de foco e avisos de prazo das tarefas (24h, 3h e 30min antes) mesmo se você sair da aba.</div>' +
       '<div class="row">' +
         '<button class="primary" onclick="requestNotifPermission()">Ativar notificações</button>' +
         '<button class="ghost" onclick="dismissNotifBanner()">Agora não</button>' +
@@ -1610,11 +1639,13 @@ function init(){
   window.addEventListener('storage', e=>{
     if(e.key===STORAGE_KEY){ state = loadState(); render(); }
   });
-  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) heartbeat(); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ heartbeat(); checkTaskDeadlines(); } });
 
   setInterval(heartbeat, 10000);
   setInterval(updateLiveClock, 1000);
   setInterval(updateTaskCountdowns, 30000);
+  setInterval(checkTaskDeadlines, 60000);
+  checkTaskDeadlines();
 
   render();
 }
