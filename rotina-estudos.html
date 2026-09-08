@@ -787,11 +787,40 @@ function setReviewNote(text){
 
 /* ---------- pending tasks ---------- */
 
-function addTask(text, subject, dueDate, dueTime){
+function addTask(text, subject, dueDate, dueTime, recurWeekday){
   const t = (text||'').trim();
   if(!t) return;
-  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, dueTime: (dueDate&&dueTime)||null, done:false, notes:'', createdAt:Date.now()});
+  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, dueTime: (dueDate&&dueTime)||null, done:false, notes:'', recurWeekday: recurWeekday||null, createdAt:Date.now()});
   saveState(); render();
+}
+function weekdayDateStr(weekdayKey, fromDate, includeSameDay){
+  const targetIdx = {dom:0,seg:1,ter:2,qua:3,qui:4,sex:5,sab:6}[weekdayKey];
+  const d = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+  let diff = (targetIdx - d.getDay() + 7) % 7;
+  if(diff===0 && !includeSameDay) diff = 7;
+  d.setDate(d.getDate()+diff);
+  const pad = n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+}
+function onRecurToggle(checked){
+  const dueEl = document.getElementById('taskDueInput');
+  const dayEl = document.getElementById('taskRecurWeekday');
+  if(dueEl) dueEl.style.display = checked ? 'none' : '';
+  if(dayEl) dayEl.style.display = checked ? '' : 'none';
+}
+function cycleRecurringTasks(){
+  let changed = false;
+  const now = new Date();
+  state.tasks.forEach(t=>{
+    if(!t.recurWeekday || !t.dueDate || !t.done) return;
+    if(dueDateTime(t).getTime() > now.getTime()) return;
+    t.dueDate = weekdayDateStr(t.recurWeekday, now, false);
+    t.done = false;
+    t.notes = '';
+    t.notifiedThresholds = [];
+    changed = true;
+  });
+  if(changed) saveState();
 }
 function setTaskNote(id, text){
   const t = state.tasks.find(x=>x.id===id);
@@ -811,8 +840,16 @@ function submitNewTask(){
   const subjEl = document.getElementById('taskSubjectSelect');
   const dueEl = document.getElementById('taskDueInput');
   const dueTimeEl = document.getElementById('taskDueTimeInput');
+  const recurEl = document.getElementById('taskRecurCheckbox');
+  const recurDayEl = document.getElementById('taskRecurWeekday');
   if(!textEl || !textEl.value.trim()) return;
-  addTask(textEl.value, subjEl.value||null, dueEl.value||null, dueTimeEl.value||null);
+  if(recurEl && recurEl.checked){
+    const weekday = recurDayEl.value;
+    const dueDate = weekdayDateStr(weekday, new Date(), true);
+    addTask(textEl.value, subjEl.value||null, dueDate, dueTimeEl.value||null, weekday);
+  } else {
+    addTask(textEl.value, subjEl.value||null, dueEl.value||null, dueTimeEl.value||null, null);
+  }
 }
 function toggleTaskDone(id){
   const t = state.tasks.find(x=>x.id===id);
@@ -1192,6 +1229,7 @@ function renderTaskItem(t){
   const color = subj ? subjColor(t.subject) : 'var(--text-muted)';
   const label = subj ? subj.short : 'Geral';
   const prazoTxt = t.dueDate ? (new Date(t.dueDate+'T00:00:00').toLocaleDateString('pt-BR')+(t.dueTime?' às '+t.dueTime:'')) : '';
+  const recurTxt = t.recurWeekday ? '🔁 toda '+DAY_NAMES[t.recurWeekday]+' — ' : '';
   const info = !t.done ? computeDueInfo(t) : null;
   const triageCls = info && info.cls==='badge hot' ? ' triage-hot' : (info && info.cls==='badge warn' ? ' triage-warn' : '');
   const hasNote = !!(t.notes && t.notes.trim());
@@ -1203,7 +1241,7 @@ function renderTaskItem(t){
     '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTaskDone(\''+t.id+'\')">' +
     '<span class="dot" style="background:'+color+';"></span>' +
     '<div class="txt'+(t.done?' done':'')+'"><b>'+label+'</b> — '+escapeHtml(t.text)+
-      (t.dueDate ? '<br><span class="small muted">prazo: '+prazoTxt+'</span>' : '') +
+      (t.dueDate ? '<br><span class="small muted">'+recurTxt+'prazo: '+prazoTxt+'</span>' : '') +
       (t.dueDate && !t.done ? ' ' + dueBadgeHtml(t) : '') +
       noteHtml +
     '</div>' +
@@ -1233,9 +1271,16 @@ function renderTarefas(){
     Object.keys(state.subjects).map(k=>'<option value="'+k+'">'+state.subjects[k].name+'</option>').join('') +
   '</select>';
   html += '<input type="date" id="taskDueInput" title="Data do prazo">';
+  html += '<select id="taskRecurWeekday" style="display:none;">' +
+    DAY_ORDER_ALL.map(d=>'<option value="'+d+'"'+(d===todayKeyAny()?' selected':'')+'>Toda '+DAY_NAMES[d]+'</option>').join('') +
+  '</select>';
   html += '<input type="time" id="taskDueTimeInput" title="Horário do prazo (opcional)">';
   html += '<button class="primary" onclick="submitNewTask()">+ Adicionar</button>';
-  html += '</div></div></div>';
+  html += '</div>';
+  html += '<label class="row small" style="gap:6px;color:var(--text-secondary);">' +
+    '<input type="checkbox" id="taskRecurCheckbox" onchange="onRecurToggle(this.checked)"> 🔁 Repetir toda semana' +
+  '</label>';
+  html += '</div></div>';
 
   const pending = state.tasks.filter(t=>!t.done).sort(sortTasksByDue);
   const done = state.tasks.filter(t=>t.done);
@@ -1639,12 +1684,13 @@ function init(){
   window.addEventListener('storage', e=>{
     if(e.key===STORAGE_KEY){ state = loadState(); render(); }
   });
-  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ heartbeat(); checkTaskDeadlines(); } });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ heartbeat(); cycleRecurringTasks(); checkTaskDeadlines(); } });
 
   setInterval(heartbeat, 10000);
   setInterval(updateLiveClock, 1000);
   setInterval(updateTaskCountdowns, 30000);
-  setInterval(checkTaskDeadlines, 60000);
+  setInterval(()=>{ cycleRecurringTasks(); checkTaskDeadlines(); }, 60000);
+  cycleRecurringTasks();
   checkTaskDeadlines();
 
   render();
