@@ -308,6 +308,13 @@
   .task-item .dot{margin-top:5px;}
   .task-item .txt{flex:1;line-height:1.4;}
   .task-item .txt.done{text-decoration:line-through;color:var(--text-muted);}
+  .task-item .txt.failed{text-decoration:line-through;color:var(--critical);}
+  .fail-btn{
+    background:none;border:1px solid var(--border);color:var(--text-muted);
+    font-size:11px;padding:3px 9px;border-radius:999px;cursor:pointer;flex:0 0 auto;
+    font-family:var(--mono);white-space:nowrap;
+  }
+  .fail-btn:hover{color:#fff;background:var(--critical);border-color:var(--critical);}
   .task-item .del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:0 4px;flex:0 0 auto;}
   .task-note{
     display:block;width:100%;margin-top:6px;padding:6px 8px;min-height:30px;
@@ -790,7 +797,7 @@ function setReviewNote(text){
 function addTask(text, subject, dueDate, dueTime, recurWeekday){
   const t = (text||'').trim();
   if(!t) return;
-  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, dueTime: (dueDate&&dueTime)||null, done:false, notes:'', recurWeekday: recurWeekday||null, createdAt:Date.now()});
+  state.tasks.unshift({id:uid(), text:t, subject: subject||null, dueDate: dueDate||null, dueTime: (dueDate&&dueTime)||null, done:false, failed:false, failedAt:null, notes:'', recurWeekday: recurWeekday||null, createdAt:Date.now()});
   saveState(); render();
 }
 function weekdayDateStr(weekdayKey, fromDate, includeSameDay){
@@ -812,10 +819,12 @@ function cycleRecurringTasks(){
   let changed = false;
   const now = new Date();
   state.tasks.forEach(t=>{
-    if(!t.recurWeekday || !t.dueDate || !t.done) return;
+    if(!t.recurWeekday || !t.dueDate || !(t.done || t.failed)) return;
     if(dueDateTime(t).getTime() > now.getTime()) return;
     t.dueDate = weekdayDateStr(t.recurWeekday, now, false);
     t.done = false;
+    t.failed = false;
+    t.failedAt = null;
     t.notes = '';
     t.notifiedThresholds = [];
     changed = true;
@@ -853,7 +862,26 @@ function submitNewTask(){
 }
 function toggleTaskDone(id){
   const t = state.tasks.find(x=>x.id===id);
-  if(t){ t.done = !t.done; saveState(); render(); }
+  if(!t) return;
+  t.done = !t.done;
+  if(t.done){ t.failed = false; t.failedAt = null; }
+  saveState(); render();
+}
+function toggleTaskFailed(id){
+  const t = state.tasks.find(x=>x.id===id);
+  if(!t) return;
+  if(t.failed){
+    t.failed = false;
+    t.failedAt = null;
+  } else {
+    t.failed = true;
+    t.failedAt = todayFullKey();
+    t.done = false;
+    const rev = ensureTodayReview();
+    rev.procrastinated = true;
+    rev.updatedAt = Date.now();
+  }
+  saveState(); render();
 }
 function deleteTask(id){
   if(!confirm('Excluir esta tarefa?')) return;
@@ -949,7 +977,7 @@ function checkTaskDeadlines(){
   if(typeof Notification==='undefined' || Notification.permission!=='granted') return;
   let changed = false;
   state.tasks.forEach(t=>{
-    if(t.done || !t.dueDate) return;
+    if(t.done || t.failed || !t.dueDate) return;
     const diffMin = (dueDateTime(t) - Date.now())/60000;
     t.notifiedThresholds = t.notifiedThresholds || [];
     const newlyCrossed = DEADLINE_THRESHOLDS.filter(th => diffMin<=th && !t.notifiedThresholds.includes(th));
@@ -1230,27 +1258,33 @@ function renderTaskItem(t){
   const label = subj ? subj.short : 'Geral';
   const prazoTxt = t.dueDate ? (new Date(t.dueDate+'T00:00:00').toLocaleDateString('pt-BR')+(t.dueTime?' às '+t.dueTime:'')) : '';
   const recurTxt = t.recurWeekday ? '🔁 toda '+DAY_NAMES[t.recurWeekday]+' — ' : '';
-  const info = !t.done ? computeDueInfo(t) : null;
+  const info = (!t.done && !t.failed) ? computeDueInfo(t) : null;
   const triageCls = info && info.cls==='badge hot' ? ' triage-hot' : (info && info.cls==='badge warn' ? ' triage-warn' : '');
   const hasNote = !!(t.notes && t.notes.trim());
   const noteOpen = hasNote || openTaskNotes.has(t.id);
   const noteHtml = noteOpen
     ? '<textarea class="task-note" data-task-id="'+t.id+'" placeholder="Observação — o que já fez, o que falta..." onblur="setTaskNote(\''+t.id+'\', this.value)">'+escapeHtml(t.notes||'')+'</textarea>'
     : '<button class="add-note-btn" onclick="toggleTaskNoteOpen(\''+t.id+'\')">+ Observação</button>';
+  const statusCls = t.done ? ' done' : (t.failed ? ' failed' : '');
+  const failedTag = t.failed ? ' <span class="badge hot">⚠ não cumprida</span>' : '';
+  const failBtn = (!t.done && !t.failed)
+    ? '<button class="fail-btn" onclick="toggleTaskFailed(\''+t.id+'\')" title="Marcar que não consegui cumprir">Não cumpri</button>'
+    : (t.failed ? '<button class="ghost" style="font-size:11px;padding:3px 9px;flex:0 0 auto;" onclick="toggleTaskFailed(\''+t.id+'\')">Desfazer</button>' : '');
   return '<div class="task-item'+triageCls+'">' +
     '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTaskDone(\''+t.id+'\')">' +
     '<span class="dot" style="background:'+color+';"></span>' +
-    '<div class="txt'+(t.done?' done':'')+'"><b>'+label+'</b> — '+escapeHtml(t.text)+
+    '<div class="txt'+statusCls+'"><b>'+label+'</b> — '+escapeHtml(t.text)+failedTag+
       (t.dueDate ? '<br><span class="small muted">'+recurTxt+'prazo: '+prazoTxt+'</span>' : '') +
-      (t.dueDate && !t.done ? ' ' + dueBadgeHtml(t) : '') +
+      (t.dueDate && !t.done && !t.failed ? ' ' + dueBadgeHtml(t) : '') +
       noteHtml +
     '</div>' +
+    failBtn +
     '<button class="del" onclick="deleteTask(\''+t.id+'\')">✕</button>' +
   '</div>';
 }
 
 function renderPendingTasksWidget(){
-  const pending = state.tasks.filter(t=>!t.done).sort(sortTasksByDue);
+  const pending = state.tasks.filter(t=>!t.done && !t.failed).sort(sortTasksByDue);
   if(!pending.length) return '';
   const urgent = pending.filter(t=>t.dueDate && (dueDateTime(t)-new Date())<=2*86400000);
   const show = (urgent.length ? urgent : pending).slice(0,4);
@@ -1282,12 +1316,19 @@ function renderTarefas(){
   '</label>';
   html += '</div></div>';
 
-  const pending = state.tasks.filter(t=>!t.done).sort(sortTasksByDue);
+  const pending = state.tasks.filter(t=>!t.done && !t.failed).sort(sortTasksByDue);
   const done = state.tasks.filter(t=>t.done);
+  const failed = state.tasks.filter(t=>t.failed);
 
   html += '<div class="card"><h2>Pendentes ('+pending.length+')</h2>';
   html += pending.length ? pending.map(renderTaskItem).join('') : '<div class="muted small">Nenhuma tarefa pendente. 🎉</div>';
   html += '</div>';
+
+  if(failed.length){
+    html += '<div class="card"><h2>Não cumpridas ('+failed.length+')</h2>';
+    html += failed.map(renderTaskItem).join('');
+    html += '</div>';
+  }
 
   if(done.length){
     html += '<div class="card"><h2>Concluídas</h2>';
@@ -1361,8 +1402,12 @@ function renderHoje(){
 function renderDailyReview(){
   const rev = getTodayReview();
   const emojis = ['😩','🙁','😐','🙂','🤩'];
+  const failedToday = state.tasks.filter(t=>t.failed && t.failedAt===todayFullKey()).length;
   let html = '<div class="card"><h2>Como foi seu dia?</h2>';
   html += '<div class="small muted" style="margin-bottom:10px;">Uma autoavaliação rápida ajuda a enxergar o padrão e se policiar contra a procrastinação.</div>';
+  if(failedToday>0){
+    html += '<div class="small" style="color:var(--critical);margin-bottom:10px;">⚠ '+failedToday+' tarefa'+(failedToday===1?'':'s')+' não cumprida'+(failedToday===1?'':'s')+' hoje — já marcamos "procrastinou" abaixo por você.</div>';
+  }
   html += '<div class="row" style="justify-content:center;gap:8px;margin-bottom:12px;">';
   html += [1,2,3,4,5].map(v=>{
     const sel = rev && rev.rating===v;
@@ -1584,16 +1629,22 @@ function renderReviewTrend(){
   pts.forEach(p=>{
     if(!p) return;
     const color = p.proc===true ? 'var(--critical)' : (p.proc===false ? 'var(--good)' : 'var(--s1)');
-    const label = p.key+' · nota '+p.v+(p.proc===true?' · procrastinou':(p.proc===false?' · sem procrastinar':''));
+    const failedOnDay = state.tasks.filter(t=>t.failed && t.failedAt===p.key).length;
+    const label = p.key+' · nota '+p.v+(p.proc===true?' · procrastinou':(p.proc===false?' · sem procrastinar':''))+(failedOnDay?' · '+failedOnDay+' tarefa'+(failedOnDay===1?'':'s')+' não cumprida'+(failedOnDay===1?'':'s'):'');
     svg += '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4" fill="'+color+'"><title>'+label+'</title></circle>';
   });
   svg += '</svg>';
+
+  const failedInWindow = state.tasks.filter(t=>t.failed && t.failedAt && days.some(d=>d.key===t.failedAt)).length;
 
   html += svg;
   html += '<div class="row" style="justify-content:space-between;margin-top:8px;">' +
     '<span class="small muted">Média: '+avg.toFixed(1)+'/5 · '+rated.length+' dia'+(rated.length===1?'':'s')+' avaliado'+(rated.length===1?'':'s')+'</span>' +
     '<span class="small muted"><span class="dot" style="background:var(--critical);width:8px;height:8px;"></span> procrastinou em '+procCount+'</span>' +
   '</div>';
+  if(failedInWindow>0){
+    html += '<div class="small muted" style="margin-top:4px;">⚠ '+failedInWindow+' tarefa'+(failedInWindow===1?'':'s')+' não cumprida'+(failedInWindow===1?'':'s')+' nesses 14 dias</div>';
+  }
   html += '</div>';
   return html;
 }
