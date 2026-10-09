@@ -698,7 +698,7 @@ function defaultState(){
       morfo:   {name:'Morfologia', short:'Morfo', slot:4, weeklyTargetMin:180, priority:2, note:''},
       pi:      {name:'Práticas Integradas', short:'PI', slot:5, weeklyTargetMin:180, priority:2, note:''}
     },
-    settings: {checkInMinutes:25, graceMinutes:10, soundOn:true, notifBannerDismissed:false, tutoriaModulo:'Neuro'},
+    settings: {checkInMinutes:25, graceMinutes:5, soundOn:true, notifBannerDismissed:false, tutoriaModulo:'Neuro'},
     active: null,
     pendingCheckIn: null,
     sessions: [],
@@ -1224,6 +1224,11 @@ async function apagarHist(id){
 function migrarHistorico(){
   if(!Array.isArray(state.historico)) state.historico = [];
   let changed = false;
+  if(state.settings && !state.settings.graceV2){   // novo padrão: encerra se não responder em 5 min
+    state.settings.graceMinutes = Math.min(Number(state.settings.graceMinutes)||5, 5);
+    state.settings.graceV2 = true;
+    changed = true;
+  }
   state.tasks.slice().forEach(t=>{
     if(!(t.done || t.failed)) return;
     const kind = t.failed ? 'failed' : 'done';
@@ -1380,8 +1385,14 @@ function respondCheckIn(yes){
 function heartbeat(){
   if(!state.active || state.active.status!=='running') return;
   const now = Date.now();
+  const checkInMs = state.settings.checkInMinutes*60000, graceMs = state.settings.graceMinutes*60000;
+  if(!state.pendingCheckIn && now - state.active.lastCheckInTs >= checkInMs + graceMs){
+    // o aparelho dormiu/ficou parado e a pergunta nem chegou a aparecer: encerra no último momento confirmado
+    finishSession(state.active.lastCheckInTs, {flagged:true, note:'Encerrada automaticamente — o Plantão ficou parado sem resposta.'});
+    return;
+  }
   if(state.pendingCheckIn){
-    if(now - state.pendingCheckIn.issuedAt >= state.settings.graceMinutes*60000){
+    if(now - state.pendingCheckIn.issuedAt >= graceMs){
       const cutoff = state.pendingCheckIn.issuedAt;
       finishSession(cutoff, {flagged:true, note:'Encerrada automaticamente — sem resposta ao check-in.'});
     }
