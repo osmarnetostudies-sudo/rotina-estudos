@@ -599,8 +599,8 @@ const HM_SUBTOPICS = [
   {key:'geral', label:'Geral / outros'}
 ];
 const TUTORIA_MODES = [
-  {key:'fechamento', label:'Fechamento (aprofundado) — pra sexta'},
-  {key:'abertura', label:'Abertura (prévia leve) — pra terça'},
+  {key:'fechamento', label:'Fechamento (aprofundado)'},
+  {key:'abertura', label:'Abertura (prévia leve)'},
   {key:'geral', label:'Revisão geral'}
 ];
 
@@ -615,7 +615,7 @@ const SCHEDULE = {
     {start:'13:00', end:'16:40', label:'PIESF', type:'aula'}
   ],
   ter: [
-    {start:'08:00', end:'11:40', label:'Tutoria de {MOD} · Abertura', type:'aula'},
+    {start:'08:00', end:'11:40', label:'Tutoria de {MOD}', type:'aula'},
     {start:'13:00', end:'14:40', label:'Livre', type:'livre'},
     {start:'15:00', end:'16:40', label:'HM: Ginecologia — Prof. Selvio (C4, sala 816)', type:'aula'}
   ],
@@ -628,7 +628,7 @@ const SCHEDULE = {
     {start:'15:00', end:'16:40', label:'HM: Cardio/Pneumo — Profª Dora (C4, sala 820) 🔥', type:'aula'}
   ],
   sex: [
-    {start:'08:00', end:'11:40', label:'Tutoria de {MOD} · Fechamento', type:'aula'},
+    {start:'08:00', end:'11:40', label:'Tutoria de {MOD}', type:'aula'},
     {start:'13:00', end:'17:00', label:'Livre (tarde)', type:'livre'}
   ]
 };
@@ -693,7 +693,7 @@ function defaultState(){
       hm:      {name:'Habilidades Médicas', short:'HM', slot:1, weeklyTargetMin:360, priority:1,
                 note:'Cobrança forte de decoreba ("rodapé de livro"), principalmente com a Profª Dora.'},
       tutoria: {name:'Tutoria', short:'Tutoria', slot:2, weeklyTargetMin:300, priority:1,
-                note:'Terça é abertura (prévia leve). O aprofundamento pesado é pro fechamento de sexta.'},
+                note:'Abertura pede só uma prévia leve; o fechamento é que pede estudo pesado. O dia de cada um muda conforme a semana.'},
       piesf:   {name:'PIESF', short:'PIESF', slot:3, weeklyTargetMin:180, priority:2, note:''},
       morfo:   {name:'Morfologia', short:'Morfo', slot:4, weeklyTargetMin:180, priority:2, note:''},
       pi:      {name:'Práticas Integradas', short:'PI', slot:5, weeklyTargetMin:180, priority:2, note:''}
