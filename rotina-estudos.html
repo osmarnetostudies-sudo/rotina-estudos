@@ -635,51 +635,49 @@ const SCHEDULE = {
 
 const FOCUS = {
   seg: [
-    {time:'11:40–12:20', subject:'morfo', note:'Revisar o que rolou na aula de hoje (Anatomia/Histologia) enquanto está fresco.'},
-    {time:'12:20–13:00', subject:'pi', note:'Revisar Práticas Integradas do período da manhã.'},
-    {time:'16:40–17:10', subject:'piesf', note:'Fixar o conteúdo da aula da tarde antes de esquecer.'},
-    {time:'19:00–19:40', subject:'hm', subtopic:'cardiopneumo', note:'Toque diário em Dora. Decoreba não pode ficar um dia sem revisão.'},
-    {time:'19:50–20:20', subject:'tutoria', mode:'abertura', note:'Leitura prévia leve do tema da abertura de amanhã. Só chegar sabendo do assunto, não precisa aprofundar.'}
+    {time:'19:00–19:50', subject:'hm', subtopic:'cardiopneumo', note:'Toque diário em Dora. Decoreba não pode ficar um dia sem revisão.'},
+    {time:'20:00–20:30', subject:'morfo', note:'Revisar a aula de hoje enquanto está fresca.'},
+    {time:'20:30–21:00', subject:'pi', note:'Revisar a aula de hoje enquanto está fresca.'},
+    {time:'21:05–21:45', subject:'tutoria', note:'Preparar a próxima sessão, seja abertura ou fechamento.'}
   ],
   ter: [
-    {time:'13:00–13:40', subject:'hm', subtopic:'gineco', note:'Ler o conteúdo antes da aula das 15h.'},
-    {time:'13:40–14:20', subject:'hm', subtopic:'cardiopneumo', note:'Toque diário em Dora.'},
-    {time:'16:40–17:10', subject:'hm', subtopic:'gineco', note:'Aula acabou de sair: revisar e já ir decorando os pontos-chave enquanto está fresco.'},
-    {time:'19:00–20:00', subject:'tutoria', mode:'fechamento', note:'Começar a aprofundar objetivo por objetivo — adianta pra não sobrecarregar quarta e quinta.'}
+    {time:'13:00–14:40', subject:'hm', subtopic:'gineco', note:'Ler o conteúdo antes da aula das 15h.'},
+    {time:'19:00–19:50', subject:'hm', subtopic:'gineco', note:'Revisar a aula que acabou de ter e já ir decorando os pontos-chave.'},
+    {time:'20:00–20:50', subject:'hm', subtopic:'cardiopneumo', note:'Toque diário em Dora.'},
+    {time:'21:00–21:45', subject:'tutoria', note:'Adiantar os objetivos da próxima sessão.'}
   ],
   qua: [
-    {time:'08:00–09:30', subject:'tutoria', mode:'fechamento', note:'Dia livre inteiro — aprofundar os primeiros objetivos, fonte na mão.'},
-    {time:'09:45–11:00', subject:'hm', subtopic:'cardiopneumo', note:'Matéria nova + decorar o rodapé (valores, exceções, nomes próprios).'},
-    {time:'11:15–12:00', subject:'hm', subtopic:'pediatria', note:'Revisar/adiantar Pediatria.'},
-    {time:'14:00–15:15', subject:'tutoria', mode:'fechamento', note:'Continuar os objetivos restantes do fechamento.'},
-    {time:'15:30–16:30', subject:'hm', subtopic:'cardiopneumo', note:'Refazer o roteiro em voz alta, do zero, sem olhar o resumo.'},
-    {time:'16:45–17:15', subject:'piesf', note:'Colocar em dia.'},
-    {time:'16:45–17:15', subject:'morfo', note:'Colocar em dia.'},
-    {time:'16:45–17:15', subject:'pi', note:'Colocar em dia.'}
+    {time:'07:30–09:00', subject:'hm', subtopic:'cardiopneumo', note:'Matéria nova + decorar o rodapé (valores, exceções, nomes próprios).'},
+    {time:'09:15–10:30', subject:'tutoria', note:'Aprofundar os objetivos da próxima sessão, fonte na mão.'},
+    {time:'10:45–11:45', subject:'hm', subtopic:'pediatria', note:'Revisar/adiantar Pediatria (aula amanhã).'},
+    {time:'14:00–15:30', subject:'hm', subtopic:'cardiopneumo', note:'Refazer o roteiro em voz alta, do zero, sem olhar o resumo.'},
+    {time:'15:45–16:45', subject:'tutoria', note:'Continuar os objetivos restantes.'},
+    {time:'17:00–17:45', subject:'piesf', note:'Colocar em dia.'},
+    {time:'19:00–20:00', subject:'hm', subtopic:'cardiopneumo', note:'Decoreba do que ainda falta pra aula de amanhã.'},
+    {time:'20:15–21:00', subject:'morfo', note:'Colocar em dia.'}
   ],
   qui: [
-    {time:'08:00–09:15', subject:'tutoria', mode:'fechamento', note:'Revisão progressiva do que já foi estudado — hoje não é pra estudar coisa nova, é pra consolidar.'},
-    {time:'09:30–10:30', subject:'hm', subtopic:'cardiopneumo', note:'Continuar a decoreba do que ainda falta.'},
-    {time:'10:45–11:45', subject:'hm', subtopic:'pediatria', note:'Última revisão antes da aula da Profª Daniela.'},
-    {time:'16:45–17:30', subject:'hm', subtopic:'cardiopneumo', note:'Aula da Dora acabou de sair: decoreba pesada enquanto está fresco (ela cobra "rodapé de livro").'},
-    {time:'19:00–19:30', subject:'tutoria', mode:'fechamento', note:'Só revisão leve. Se já estudou tudo nos dias anteriores, isso é tudo que deveria faltar — sem virar a madrugada.'}
+    {time:'07:30–09:00', subject:'hm', subtopic:'cardiopneumo', note:'Última revisão antes da aula da Dora.'},
+    {time:'09:15–10:15', subject:'hm', subtopic:'pediatria', note:'Última revisão antes da aula da Profª Daniela.'},
+    {time:'10:30–11:30', subject:'tutoria', mode:'fechamento', note:'Adiantar o fechamento antes de ir pra faculdade.'},
+    {time:'19:00–20:30', subject:'tutoria', mode:'fechamento', note:'Depois da aula da Dora, a noite é só da tutoria.'},
+    {time:'20:45–21:30', subject:'tutoria', mode:'fechamento', note:'Só revisão leve, sem virar a noite.'}
   ],
   sex: [
-    {time:'13:00–13:50', subject:'piesf', note:'Tarde livre: colocar em dia.'},
-    {time:'14:00–14:50', subject:'morfo', note:'Tarde livre: colocar em dia.'},
-    {time:'15:00–15:50', subject:'pi', note:'Tarde livre: colocar em dia.'},
-    {time:'16:00–16:40', subject:'hm', subtopic:'cardiopneumo', note:'Revisão leve pra não perder o ritmo até segunda.'}
+    {time:'18:00–18:20', subject:'geral', note:'Resto do dia é descanso. Só organizar o fim de semana.'}
   ],
   sab: [
-    {time:'09:00–10:00', subject:'morfo', note:'Adiantar o conteúdo da semana que vem — evita ter que virar a madrugada de domingo pra segunda.'},
-    {time:'10:15–11:15', subject:'pi', note:'Adiantar o conteúdo da semana que vem.'},
-    {time:'15:00–16:00', subject:'hm', subtopic:'cardiopneumo', note:'Aprofundar com calma, sem a pressão da aula.'}
+    {time:'08:00–09:30', subject:'hm', subtopic:'cardiopneumo', note:'Aprofundar com calma, sem a pressão da aula.'},
+    {time:'09:45–10:45', subject:'morfo', note:'Adiantar o conteúdo da semana que vem.'},
+    {time:'11:00–12:00', subject:'pi', note:'Adiantar o conteúdo da semana que vem.'},
+    {time:'15:00–16:00', subject:'piesf', note:'Colocar em dia.'},
+    {time:'16:15–17:00', subject:'hm', subtopic:'cardiopneumo', note:'Decorar o rodapé.'}
   ],
   dom: [
-    {time:'09:00–10:00', subject:'hm', subtopic:'cardiopneumo', note:'Continuar aprofundando / decoreba.'},
-    {time:'10:15–11:00', subject:'morfo', note:'Terminar de adiantar pra segunda.'},
+    {time:'08:00–09:30', subject:'hm', subtopic:'cardiopneumo', note:'Continuar aprofundando / decoreba.'},
+    {time:'09:45–10:45', subject:'morfo', note:'Terminar de adiantar pra segunda.'},
     {time:'11:00–11:45', subject:'pi', note:'Terminar de adiantar pra segunda.'},
-    {time:'11:45–12:15', subject:'piesf', note:'Colocar em dia.'},
+    {time:'15:00–15:30', subject:'tutoria', note:'Só uma olhada no tema da semana.'},
     {time:'19:00–19:30', subject:'geral', note:'Olhar a semana que vem e ajustar o plano.'}
   ]
 };
