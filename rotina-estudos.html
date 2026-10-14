@@ -593,6 +593,60 @@ textarea.importar{min-height:90px;font:12.5px var(--mono);}
 @media (max-width:860px){ .n-tiles{grid-template-columns:minmax(0,1fr) minmax(0,1fr);} .n-tile.big{grid-column:1 / -1;} }
 @media (max-width:420px){ .n-tiles{grid-template-columns:minmax(0,1fr);} .n-pl-l{width:74px;font-size:12.5px;} .n-in{width:42px!important;} .n-t-num{font-size:30px;} }
 
+/* ---------- diário ---------- */
+.ic.flip{transform:scaleX(-1);}
+.d-nav{display:flex;gap:2px;}
+.d-nav .icon-only:hover{color:var(--ink);}
+.d-nav .icon-only:disabled{opacity:.3;cursor:default;}
+.d-top{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.d-ring{position:relative;width:72px;height:72px;flex:none;}
+.d-ring svg{width:100%;height:100%;display:block;}
+.d-ring circle{transition:stroke-dasharray .4s;}
+.d-ring span{position:absolute;inset:0;display:grid;place-items:center;font:800 20px var(--display);}
+.d-ring small{font-size:12px;color:var(--ink-3);font-weight:600;}
+.d-ring span{display:flex;align-items:center;justify-content:center;}
+.d-frase{display:flex;flex-direction:column;gap:2px;font-size:14px;}
+.d-frase span{color:var(--ink-2);font-size:13.5px;}
+.d-sono{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end;padding:12px;border-radius:12px;background:var(--surface-2);margin-bottom:12px;}
+.d-sono label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:var(--ink-2);min-width:0;}
+.d-sono label span{display:flex;align-items:center;gap:5px;}
+.d-sono input{width:100%;background:var(--surface);}
+.d-horas{display:flex;flex-direction:column;align-items:center;padding:4px 6px;min-width:66px;}
+.d-horas b{font:800 22px/1.1 var(--display);color:var(--c);}
+.d-horas small{font-size:11.5px;color:var(--ink-3);}
+.d-list{display:flex;flex-direction:column;}
+.d-item{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);cursor:pointer;--c:var(--s5);}
+.d-item:last-child{border-bottom:none;}
+.d-item.auto{cursor:default;}
+.d-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--s5) 12%,transparent);color:var(--s5);flex:none;}
+.d-nome{flex:1;font-size:14px;font-weight:600;display:flex;flex-direction:column;}
+.d-nome small{font-size:11.5px;color:var(--ink-3);font-weight:500;}
+.d-item.feito .d-nome{color:var(--ink-2);}
+.d-auto{width:22px;height:22px;border-radius:7px;border:2px dashed var(--line-2);display:grid;place-items:center;flex:none;}
+.d-auto.on{background:var(--s5);border:2px solid var(--s5);color:#fff;}
+.d-auto .ic{width:14px;height:14px;stroke-width:3;}
+.d-x{width:28px;height:28px;opacity:.5;}
+.d-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;}
+.d-tile{background:var(--surface-2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:3px;min-width:0;}
+.d-tl{font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);}
+.d-tile b{font:800 26px/1.1 var(--display);}
+.d-tile b small{font-size:14px;color:var(--ink-3);}
+.d-tile > small{font-size:12px;color:var(--ink-3);}
+.d-tile .delta{justify-content:flex-start;}
+.d-chart{position:relative;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:200px;padding-top:8px;}
+.d-meta{position:absolute;left:0;right:0;border-top:2px dashed var(--ink-3);opacity:.55;pointer-events:none;}
+.legend i.d-lg-meta{width:14px;height:0;border-top:2px dashed var(--ink-3);background:none;border-radius:0;opacity:1;}
+.d-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%;min-width:0;}
+.d-v{font:600 11px var(--mono);color:var(--ink-2);}
+.d-bar{width:100%;max-width:44px;border-radius:8px 8px 3px 3px;background:var(--c);}
+.d-bar.vazio{background:repeating-linear-gradient(45deg,var(--sunken),var(--sunken) 5px,transparent 5px,transparent 10px);border:1px dashed var(--line-2);}
+.d-est{font:600 10.5px var(--mono);color:var(--accent);height:14px;}
+.d-dia{font:600 11px var(--mono);color:var(--ink-3);height:16px;}
+.d-dia.hoje{color:var(--accent);}
+.d-metas{display:flex;flex-wrap:wrap;gap:10px 18px;}
+.d-metas label{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2);font-weight:600;}
+@media (max-width:420px){ .d-sono{grid-template-columns:minmax(0,1fr) minmax(0,1fr);} .d-horas{grid-column:1 / -1;flex-direction:row;gap:6px;justify-content:center;} .d-chart{gap:4px;} }
+
 /* ---------- telas menores ---------- */
 @media (max-width:860px){
   .hoje-grid,.grid2{grid-template-columns:minmax(0,1fr);}
@@ -778,6 +832,7 @@ function defaultState(){
     sync: {code:null},
     gradeExtras: [],
     notas: notasSeed(),
+    diario: diarioSeed(),
     localAt: 0,
     ui: {tab:'hoje', theme:null}
   };
@@ -809,6 +864,7 @@ function loadState(){
   merged.historico = Array.isArray(raw.historico) ? raw.historico : [];
   merged.gradeExtras = Array.isArray(raw.gradeExtras) ? raw.gradeExtras : [];
   merged.notas = notasFix((raw.notas && Array.isArray(raw.notas.modulos)) ? raw.notas : notasSeed());
+  merged.diario = diarioFix(raw.diario);
   merged.sync = Object.assign({code:null}, raw.sync);
   return merged;
 }
@@ -823,7 +879,7 @@ function uid(){ return Date.now().toString(36) + Math.random().toString(36).slic
 
 /* ---------- sincronização entre aparelhos (Firebase, pelo código) ---------- */
 
-const SYNC_FIELDS = ['subjects','settings','sessions','dailyReviews','tasks','blocoChecks','historico','gradeExtras','notas'];
+const SYNC_FIELDS = ['subjects','settings','sessions','dailyReviews','tasks','blocoChecks','historico','gradeExtras','notas','diario'];
 let applyingRemote = false;
 let syncStatus = {txt:'sem sincronização', cls:'erro'};
 
@@ -861,7 +917,7 @@ function handleRemoteSync(data, deOutro){
   if(remoto < local){ agendarSync(); return; }         // este aparelho está mais novo: manda
   if(remoto === local){ setSync('sincronizado',''); return; }
   applyingRemote = true;
-  SYNC_FIELDS.forEach(f=>{ if(data[f]!==undefined) state[f] = data[f]; });
+  SYNC_FIELDS.forEach(f=>{ if(data[f]!==undefined) state[f] = data[f]; }); normalizarExtras();
   state.localAt = remoto;
   const migrou = migrarHistorico();
   saveState();
@@ -899,7 +955,7 @@ async function joinSync(codeRaw){
   applyingRemote = true;
   state.sync = {code};
   if(r.data){
-    SYNC_FIELDS.forEach(f=>{ if(r.data[f]!==undefined) state[f] = r.data[f]; });
+    SYNC_FIELDS.forEach(f=>{ if(r.data[f]!==undefined) state[f] = r.data[f]; }); normalizarExtras();
     state.localAt = r.data.updatedAt || Date.now();
     migrarHistorico();
   }
@@ -946,7 +1002,7 @@ async function importarDados(){
   if(!(await confirmar('Trocar os dados daqui pelos que você colou? '+d.tasks.length+' tarefa(s) pendente(s) e '+((d.historico||[]).length)+' registro(s) de histórico vão entrar.'))) return;
   const idsChat = new Set(d.tasks.map(t=>t.id));
   const doChat = state.tasks.filter(t=>String(t.id).startsWith('chat-') && !idsChat.has(t.id));
-  SYNC_FIELDS.forEach(f=>{ if(d[f]!==undefined) state[f] = d[f]; });
+  SYNC_FIELDS.forEach(f=>{ if(d[f]!==undefined) state[f] = d[f]; }); normalizarExtras();
   state.tasks = doChat.concat(state.tasks);
   migrarHistorico();
   saveState(); render();
@@ -1606,6 +1662,7 @@ const ICONS = {
   trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
   pin:'<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
   grad:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+  dumbbell:'<path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/>',
   sparkle:'<path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/>'
 };
 function ic(n, cls){ return '<svg class="ic'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[n]||'')+'</svg>'; }
@@ -2046,7 +2103,7 @@ function renderHoje(){
 
   html += '<div class="hoje-grid">' +
     '<div class="stack">' + renderAgendaHoje() + blocos + '</div>' +
-    '<div class="stack">' + renderPendingTasksWidget() + sessao + renderDailyReview() + '</div>' +
+    '<div class="stack">' + renderDiarioHoje() + renderPendingTasksWidget() + sessao + renderDailyReview() + '</div>' +
   '</div>';
   return html;
 }
@@ -2249,6 +2306,7 @@ function renderProgresso(){
   html += '<div class="legend"><span><i></i>onde deveria estar até hoje</span></div>';
   html += '</div>';
 
+  html += renderBalancoDiario();
   html += renderProcrastinacao();
   html += '<div class="grid2" style="margin-top:16px">' + renderReviewTrend() +
     '<div class="card">' + cardHead('grid','Últimos 35 dias','var(--accent)') + renderHeatmap() + '</div></div>';
@@ -3014,6 +3072,220 @@ function renderModuloNotas(m, I, mi){
   if(I.finalAcel!==null) html += '<div class="n-info">'+ic('sparkle')+'Com aceleração: '+fmtN(I.probAvg)+'×50% + '+fmtN(nv(m.provaTutoria))+'×20% + '+fmtN(I.acel)+'×30% = <b>'+fmtN(I.finalAcel)+'</b></div>';
   if(I.praticaDe==='média informada') html += '<div class="hint" style="margin:8px 0 0">Prova prática calculada a partir da média informada: '+fmtN(I.pratica)+'.</div>';
   html += '</div></div>';
+  return html;
+}
+
+/* ---------- diário do dia a dia (hábitos + sono) ---------- */
+
+function normalizarExtras(){ state.notas = notasFix(state.notas && Array.isArray(state.notas.modulos) ? state.notas : notasSeed()); state.diario = diarioFix(state.diario); }
+function diarioSeed(){
+  return {
+    metas:{dormir:'22:00', acordar:'05:00', tolerancia:15, horasSono:7},
+    habitos:[{id:'academia', nome:'Fui na academia', icone:'dumbbell'}],
+    dias:{}
+  };
+}
+function diarioFix(D){
+  const d = diarioSeed();
+  if(!D || typeof D!=='object') return d;
+  D.metas = Object.assign({}, d.metas, D.metas||{});
+  if(!Array.isArray(D.habitos)) D.habitos = d.habitos;
+  if(!D.dias || typeof D.dias!=='object') D.dias = {};
+  return D;
+}
+let diarioOffset = 0;          // 0 = hoje, -1 = ontem…
+let diarioAddAberto = false;
+
+function hm2m(s){ const m = /^(\d{1,2}):(\d{2})$/.exec(String(s||'').trim()); return m ? (+m[1])*60 + (+m[2]) : null; }
+function diaKeyOffset(off){ const d = new Date(); d.setDate(d.getDate()+off); return localDateKey(d); }
+function diarioDia(k, criar){
+  const D = state.diario;
+  if(!D.dias[k] && criar) D.dias[k] = {h:{}, dormiu:'', acordou:''};
+  return D.dias[k] || {h:{}, dormiu:'', acordou:''};
+}
+/* sono da noite que terminou no dia k (dormiu na véspera, acordou no dia k) */
+function sonoInfo(k){
+  const r = diarioDia(k), M = state.diario.metas;
+  const a = hm2m(r.dormiu), b = hm2m(r.acordou);
+  let min = null;
+  if(a!==null && b!==null){ min = b - a; if(min<=0) min += 1440; }
+  const metaD = hm2m(M.dormir), metaA = hm2m(M.acordar), tol = +M.tolerancia||0;
+  // "na hora": dormiu entre 18h e a meta + tolerância (dormir depois da meia-noite conta como atrasado)
+  const naHora = a===null ? null : (a>=18*60 && a<=metaD+tol);
+  const acordouCedo = b===null ? null : (b<=metaA+tol && b>=metaA-120);
+  return {min, naHora, acordouCedo, dormiu:r.dormiu, acordou:r.acordou};
+}
+function corSono(min){
+  if(min===null) return 'var(--ink-3)';
+  const meta = (+state.diario.metas.horasSono||7)*60;
+  if(min>=meta) return 'var(--good)';
+  if(min>=meta-60) return 'var(--warn)';
+  return 'var(--crit)';
+}
+function fmtSono(min){ if(min===null) return '—'; const h=Math.floor(min/60), m=min%60; return h+'h'+(m?String(m).padStart(2,'0'):''); }
+function itensDoDia(k){
+  const r = diarioDia(k), s = sonoInfo(k), M = state.diario.metas;
+  const itens = [
+    {id:'_dormiu', nome:'Dormi na hora (até '+M.dormir+')', auto:true, feito: s.naHora===true, ic:'moon'},
+    {id:'_acordou', nome:'Acordei às '+M.acordar, auto:true, feito: s.acordouCedo===true, ic:'sun'}
+  ];
+  state.diario.habitos.forEach(h=>itens.push({id:h.id, nome:h.nome, auto:false, feito: !!(r.h && r.h[h.id]), ic:h.icone||'check'}));
+  return itens;
+}
+
+function diarioSetHora(campo, val){
+  const k = diaKeyOffset(diarioOffset);
+  const r = diarioDia(k, true);
+  r[campo] = String(val||'');
+  saveState(); notasRender();
+}
+function diarioToggle(id){
+  const k = diaKeyOffset(diarioOffset);
+  const r = diarioDia(k, true);
+  r.h = r.h || {};
+  r.h[id] = !r.h[id];
+  saveState(); render();
+  if(r.h[id]){ const it = itensDoDia(k); if(it.every(x=>x.feito)) aviso('Dia completo! 🎉'); }
+}
+function diarioMudaDia(delta){ diarioOffset = Math.min(0, Math.max(-6, diarioOffset+delta)); render(); }
+function diarioAbrirAdd(){ diarioAddAberto = !diarioAddAberto; render(); setTimeout(()=>{ const el=document.getElementById('diarioNovo'); if(el) el.focus(); },30); }
+function diarioAddHabito(){
+  const el = document.getElementById('diarioNovo');
+  const nome = el ? el.value.trim() : '';
+  if(!nome){ aviso('Escreva o hábito primeiro.'); return; }
+  state.diario.habitos.push({id:'h'+uid(), nome, icone:'check'});
+  diarioAddAberto = false;
+  saveState(); render();
+}
+async function diarioRemoverHabito(id){
+  const h = state.diario.habitos.find(x=>x.id===id);
+  if(!h) return;
+  if(!(await confirmar('Tirar "'+h.nome+'" da lista? O que você já marcou nos dias anteriores continua no histórico.'))) return;
+  state.diario.habitos = state.diario.habitos.filter(x=>x.id!==id);
+  saveState(); render();
+}
+function diarioSetMeta(campo, val){
+  if(campo==='horasSono'){ const n = parseFloat(String(val).replace(',','.')); if(!(n>0 && n<14)) { aviso('Coloque as horas de sono (ex.: 7).'); render(); return; } state.diario.metas.horasSono = n; }
+  else { if(hm2m(val)===null){ render(); return; } state.diario.metas[campo] = val; }
+  saveState(); render();
+}
+
+function renderDiarioHoje(){
+  const k = diaKeyOffset(diarioOffset);
+  const itens = itensDoDia(k);
+  const feitos = itens.filter(x=>x.feito).length;
+  const pct = Math.round(feitos/itens.length*100);
+  const s = sonoInfo(k);
+  const titulo = diarioOffset===0 ? 'Diário de hoje' : 'Diário · '+fmtDia(k);
+  const nav = '<div class="d-nav"><button class="icon-only" onclick="diarioMudaDia(-1)" '+(diarioOffset<=-6?'disabled':'')+' aria-label="Dia anterior">'+ic('chev','flip')+'</button>' +
+    '<button class="icon-only" onclick="diarioMudaDia(1)" '+(diarioOffset>=0?'disabled':'')+' aria-label="Próximo dia">'+ic('chev')+'</button></div>';
+  let html = '<div class="card diario">' + cardHead('book', titulo, 'var(--s5)', nav);
+
+  // anel de progresso
+  const C = 2*Math.PI*30, frase = pct===100 ? 'Dia completo. Isso é constância.' : (pct>=50 ? 'Mais da metade. Bora fechar o dia.' : (feitos ? 'Começou. Cada marquinha conta.' : 'Marque o que você for fazendo ao longo do dia.'));
+  html += '<div class="d-top"><div class="d-ring"><svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="30" fill="none" stroke="var(--sunken)" stroke-width="8"/>' +
+    '<circle cx="36" cy="36" r="30" fill="none" stroke="var(--s5)" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+(C*pct/100)+' '+C+'" transform="rotate(-90 36 36)"/></svg>' +
+    '<span>'+feitos+'<small>/'+itens.length+'</small></span></div>' +
+    '<div class="d-frase"><b>'+pct+'% do dia</b><span>'+frase+'</span></div></div>';
+
+  // sono
+  html += '<div class="d-sono">' +
+    '<label><span>'+ic('moon')+'Dormi '+(diarioOffset===0?'ontem ':'na véspera ')+'às</span><input type="time" id="d-dormiu" value="'+escapeHtml(s.dormiu||'')+'" onchange="diarioSetHora(\'dormiu\', this.value)"></label>' +
+    '<label><span>'+ic('sun')+'Acordei às</span><input type="time" id="d-acordou" value="'+escapeHtml(s.acordou||'')+'" onchange="diarioSetHora(\'acordou\', this.value)"></label>' +
+    '<div class="d-horas" style="--c:'+corSono(s.min)+'"><b>'+fmtSono(s.min)+'</b><small>de sono</small></div>' +
+  '</div>';
+
+  // hábitos
+  html += '<div class="d-list">' + itens.map(it=>{
+    const auto = it.auto;
+    const ctrl = auto
+      ? '<span class="d-auto'+(it.feito?' on':'')+'">'+(it.feito?ic('check'):'')+'</span>'
+      : '<input type="checkbox" class="ck" '+(it.feito?'checked':'')+' onchange="diarioToggle(\''+it.id+'\')" aria-label="'+escapeHtml(it.nome)+'">';
+    return '<label class="d-item'+(it.feito?' feito':'')+(auto?' auto':'')+'">' + ctrl +
+      '<span class="d-ic">'+ic(it.ic)+'</span><span class="d-nome">'+escapeHtml(it.nome)+(auto?'<small>marca sozinho pelo horário</small>':'')+'</span>' +
+      (!auto && it.id!=='academia' ? '<button class="icon-only d-x" onclick="event.preventDefault();diarioRemoverHabito(\''+it.id+'\')" aria-label="Tirar hábito">'+ic('x')+'</button>' : '') +
+    '</label>';
+  }).join('') + '</div>';
+  if(diarioAddAberto){
+    html += '<div class="add-line"><input type="text" id="diarioNovo" placeholder="Ex.: Li 10 páginas, Bebi 2 L de água…" onkeydown="if(event.key===\'Enter\'){diarioAddHabito();}"><button class="btn" onclick="diarioAddHabito()">Adicionar</button></div>';
+  } else {
+    html += '<button class="btn sm ghost" style="margin-top:6px" onclick="diarioAbrirAdd()">'+ic('plus')+'Novo hábito</button>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ---- balanço da semana (aba Progresso) ---- */
+function diasJanela(n, fimOff){ const out=[]; for(let i=n-1+fimOff;i>=fimOff;i--) out.push(diaKeyOffset(-i)); return out; }
+function statsDiario(keys){
+  const sonos = keys.map(sonoInfo);
+  const comSono = sonos.filter(x=>x.min!==null);
+  const mediaSono = comSono.length ? comSono.reduce((a,x)=>a+x.min,0)/comSono.length : null;
+  const naHora = sonos.filter(x=>x.naHora===true).length;
+  const cedo = sonos.filter(x=>x.acordouCedo===true).length;
+  const hab = {}; state.diario.habitos.forEach(h=>{ hab[h.id] = keys.filter(k=>{ const r = diarioDia(k); return r.h && r.h[h.id]; }).length; });
+  let feitos=0, total=0; keys.forEach(k=>{ const it = itensDoDia(k); total += it.length; feitos += it.filter(x=>x.feito).length; });
+  return {sonos, mediaSono, noitesReg: comSono.length, naHora, cedo, hab, pct: total ? Math.round(feitos/total*100) : 0};
+}
+function renderBalancoDiario(){
+  const keys = diasJanela(7, 0);
+  const A = statsDiario(keys), B = statsDiario(diasJanela(7, 7));
+  const meta = (+state.diario.metas.horasSono||7)*60;
+  const totals = dailyTotals();
+  let html = '<div class="card" style="margin-top:16px">' + cardHead('moon','Balanço da semana · sono e hábitos','var(--s5)', '<span class="badge soft">últimos 7 dias</span>');
+  if(!A.noitesReg && !Object.values(A.hab).some(x=>x)){
+    html += '<div class="empty">'+ic('moon')+'Ainda sem registros. Anote a hora que dormiu e acordou no Diário (aba Hoje) e o balanço aparece aqui.</div></div>';
+    return html;
+  }
+  let dSono = '';
+  if(A.mediaSono!==null && B.mediaSono!==null){ const d = Math.round(A.mediaSono - B.mediaSono); if(d) dSono = '<span class="delta '+(d>0?'up':'down')+'">'+ic(d>0?'arrowUp':'arrowDown')+fmtSono(Math.abs(d))+' vs semana anterior</span>'; }
+  html += '<div class="d-tiles">' +
+    '<div class="d-tile"><span class="d-tl">Média de sono</span><b style="color:'+corSono(A.mediaSono===null?null:Math.round(A.mediaSono))+'">'+fmtSono(A.mediaSono===null?null:Math.round(A.mediaSono))+'</b><small>'+A.noitesReg+' noite'+(A.noitesReg===1?'':'s')+' anotada'+(A.noitesReg===1?'':'s')+' · meta '+fmtSono(meta)+'</small>'+dSono+'</div>' +
+    '<div class="d-tile"><span class="d-tl">Dormiu na hora</span><b>'+A.naHora+'<small>/7</small></b><small>até '+state.diario.metas.dormir+'</small></div>' +
+    '<div class="d-tile"><span class="d-tl">Acordou às '+state.diario.metas.acordar+'</span><b>'+A.cedo+'<small>/7</small></b></div>' +
+    state.diario.habitos.map(h=>'<div class="d-tile"><span class="d-tl">'+escapeHtml(h.nome)+'</span><b>'+A.hab[h.id]+'<small>/7</small></b><small>'+(B.hab[h.id]!==undefined?'semana anterior: '+B.hab[h.id]:'')+'</small></div>').join('') +
+  '</div>';
+
+  // gráfico: horas de sono por noite + estudo do dia
+  const maxMin = Math.max(meta+60, ...A.sonos.map(x=>x.min||0));
+  const ini = ['D','S','T','Q','Q','S','S'];
+  html += '<h3>Sono de cada noite e quanto estudou no dia</h3><div class="d-chart">' +
+    '<span class="d-meta" style="bottom:'+(36+meta/maxMin*130)+'px"></span>' +
+    keys.map((k,i)=>{
+      const s = A.sonos[i], est = totals[k]||0, dt = new Date(k+'T12:00:00');
+      const h = s.min===null ? 0 : Math.max(4, s.min/maxMin*130);
+      const tip = fmtDia(k)+': '+(s.min===null?'sono não anotado':fmtSono(s.min)+' de sono ('+s.dormiu+' → '+s.acordou+')')+' · estudou '+fmtDuration(est);
+      return '<div class="d-col" title="'+escapeHtml(tip)+'"><span class="d-v">'+(s.min===null?'':fmtSono(s.min))+'</span>' +
+        '<div class="d-bar'+(s.min===null?' vazio':'')+'" style="height:'+(s.min===null?130:h)+'px;--c:'+corSono(s.min)+'"></div>' +
+        '<span class="d-est">'+(est?fmtDuration(est):'—')+'</span><span class="d-dia'+(k===todayFullKey()?' hoje':'')+'">'+ini[dt.getDay()]+' '+dt.getDate()+'</span></div>';
+    }).join('') + '</div>';
+  html += '<div class="legend"><span><span class="lg-sq" style="background:var(--good)"></span>dormiu a meta</span><span><span class="lg-sq" style="background:var(--warn)"></span>até 1h a menos</span><span><span class="lg-sq" style="background:var(--crit)"></span>bem abaixo</span><span><i class="d-lg-meta"></i>meta de '+fmtSono(meta)+'</span><span>embaixo, em verde: tempo de estudo do dia</span></div>';
+
+  // sono x estudo (14 dias pra ter mais base)
+  const k14 = diasJanela(14, 0).filter(k=>sonoInfo(k).min!==null);
+  const bons = k14.filter(k=>sonoInfo(k).min>=meta), ruins = k14.filter(k=>sonoInfo(k).min<meta);
+  const mEst = arr => arr.length ? arr.reduce((a,k)=>a+(totals[k]||0),0)/arr.length : null;
+  const mNota = arr => { const v = arr.map(k=>state.dailyReviews[k] && state.dailyReviews[k].rating).filter(Boolean); return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null; };
+  const procDe = arr => arr.filter(k=>diaInfo(k).proc).length;
+  if(bons.length && ruins.length){
+    const eb = mEst(bons), er = mEst(ruins);
+    let txt = 'Nos dias depois de dormir '+fmtSono(meta)+' ou mais, você estudou em média <b>'+fmtDuration(eb)+'</b>; depois de noite curta, <b>'+fmtDuration(er)+'</b>.';
+    const pb = procDe(bons), pr = procDe(ruins);
+    txt += ' Procrastinou em '+pb+' de '+bons.length+' dia'+(bons.length===1?'':'s')+' bem dormidos e em '+pr+' de '+ruins.length+' depois de noite curta.';
+    const nb = mNota(bons), nr = mNota(ruins);
+    if(nb!==null && nr!==null) txt += ' Nota do dia: '+nb.toFixed(1).replace('.',',')+' contra '+nr.toFixed(1).replace('.',',')+'.';
+    html += '<div class="placar-frase">'+ic('sparkle')+'<span>'+txt+' <span class="muted">(últimos 14 dias)</span></span></div>';
+  } else {
+    html += '<div class="hint" style="margin:12px 0 0">Com algumas noites boas e algumas curtas anotadas, aparece aqui a comparação de quanto você estuda (e procrastina) depois de cada tipo de noite.</div>';
+  }
+
+  // metas
+  html += '<h3>Metas</h3><div class="d-metas">' +
+    '<label>Dormir até <input type="time" value="'+state.diario.metas.dormir+'" onchange="diarioSetMeta(\'dormir\', this.value)"></label>' +
+    '<label>Acordar às <input type="time" value="'+state.diario.metas.acordar+'" onchange="diarioSetMeta(\'acordar\', this.value)"></label>' +
+    '<label>Horas de sono <input type="number" step="0.5" min="4" max="12" value="'+state.diario.metas.horasSono+'" onchange="diarioSetMeta(\'horasSono\', this.value)"></label>' +
+  '</div><div class="hint" style="margin:6px 0 0">Conta como "na hora" até 15 min depois da meta.</div>';
+  html += '</div>';
   return html;
 }
 
