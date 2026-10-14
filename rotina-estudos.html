@@ -12,7 +12,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Plantão">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}.ciclo-tg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 12px;font-size:13px;color:var(--ink-3)}.ciclo-tg button{font:inherit;font-weight:600;border:1px solid var(--line,#ccd);background:transparent;color:inherit;border-radius:999px;padding:5px 11px;cursor:pointer}.ciclo-tg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+</style>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -758,54 +759,84 @@ const SCHEDULE = {
   ]
 };
 
-const FOCUS = {
+/* Plano espaçado (out/2026): Dora e tutoria em pedaços ao longo da semana, véspera só revisão.
+   Ciclo A = abertura na terça, fechamento na sexta. Ciclo B = abertura na sexta, fechamento na terça. */
+const FOCUS_COMUM = {
   seg: [
-    {time:'19:00–19:50', subject:'hm', subtopic:'cardiopneumo', note:'Toque diário em Dora. Decoreba não pode ficar um dia sem revisão.'},
-    {time:'20:00–20:30', subject:'morfo', note:'Revisar a aula de hoje enquanto está fresca.'},
-    {time:'20:30–21:00', subject:'pi', note:'Revisar a aula de hoje enquanto está fresca.'},
-    {time:'21:05–21:45', subject:'tutoria', note:'Preparar a próxima sessão, seja abertura ou fechamento.'}
+    {time:'19:00–19:30', subject:'hm', subtopic:'cardiopneumo', note:'Dora · 3ª vez no assunto: só cartões e perguntas, puxando da cabeça. Travou? Não abra o material, force uns segundos e depois confira.'},
+    {time:'19:40–20:20', subject:'morfo', note:'Morfo + PI · revisar a aula de hoje enquanto está fresca e anotar 5 perguntas sobre ela (viram cartões).'}
   ],
   ter: [
-    {time:'13:00–14:40', subject:'hm', subtopic:'gineco', note:'Ler o conteúdo antes da aula das 15h.'},
-    {time:'19:00–19:50', subject:'hm', subtopic:'gineco', note:'Revisar a aula que acabou de ter e já ir decorando os pontos-chave.'},
-    {time:'20:00–20:50', subject:'hm', subtopic:'cardiopneumo', note:'Toque diário em Dora.'},
-    {time:'21:00–21:45', subject:'tutoria', note:'Adiantar os objetivos da próxima sessão.'}
+    {time:'13:00–14:00', subject:'hm', subtopic:'gineco', note:'Gineco · ler o tema antes da aula das 15h, só para chegar antenado.'},
+    {time:'14:00–14:30', subject:'hm', subtopic:'cardiopneumo', note:'Dora · cartões rápidos (4ª vez no assunto). Só puxar da cabeça.'},
+    {time:'19:00–19:25', subject:'hm', subtopic:'gineco', note:'Gineco · revisar a aula que acabou de ter: escrever em 5 linhas o que caiu. Evita acumular para a prova.'}
   ],
   qua: [
-    {time:'07:30–09:00', subject:'hm', subtopic:'cardiopneumo', note:'Matéria nova + decorar o rodapé (valores, exceções, nomes próprios).'},
-    {time:'09:15–10:30', subject:'tutoria', note:'Aprofundar os objetivos da próxima sessão, fonte na mão.'},
-    {time:'10:45–11:45', subject:'hm', subtopic:'pediatria', note:'Revisar/adiantar Pediatria (aula amanhã).'},
-    {time:'14:00–15:30', subject:'hm', subtopic:'cardiopneumo', note:'Refazer o roteiro em voz alta, do zero, sem olhar o resumo.'},
-    {time:'15:45–16:45', subject:'tutoria', note:'Continuar os objetivos restantes.'},
-    {time:'17:00–17:45', subject:'piesf', note:'Colocar em dia.'},
-    {time:'19:00–20:00', subject:'hm', subtopic:'cardiopneumo', note:'Decoreba do que ainda falta pra aula de amanhã.'},
-    {time:'20:15–21:00', subject:'morfo', note:'Colocar em dia.'}
+    {time:'07:30–09:00', subject:'hm', subtopic:'cardiopneumo', note:'Dora · aprofundar o rodapé (valores, exceções, nomes) e responder EM VOZ ALTA cada pergunta, como se ela estivesse perguntando.'},
+    {time:'11:00–11:40', subject:'hm', subtopic:'pediatria', note:'Pediatria · ler o tema da aula de amanhã (leve).'},
+    {time:'15:30–16:30', subject:'hm', subtopic:'cardiopneumo', note:'Dora · simulado oral: sorteie perguntas e responda em até 10 segundos, sem olhar. O que travou vira cartão.'},
+    {time:'16:45–17:30', subject:'pi', note:'Morfo + PI · puxar da cabeça as perguntas de segunda (provinhas). 45 min e acabou.'},
+    {time:'20:30–21:00', subject:'hm', subtopic:'cardiopneumo', note:'Dora · cartões que errou hoje. Depois, cama às 22h: o sono fixa o que você estudou.'}
   ],
   qui: [
-    {time:'07:30–09:00', subject:'hm', subtopic:'cardiopneumo', note:'Última revisão antes da aula da Dora.'},
-    {time:'09:15–10:15', subject:'hm', subtopic:'pediatria', note:'Última revisão antes da aula da Profª Daniela.'},
-    {time:'10:30–11:30', subject:'tutoria', mode:'fechamento', note:'Adiantar o fechamento antes de ir pra faculdade.'},
-    {time:'19:00–20:30', subject:'tutoria', mode:'fechamento', note:'Depois da aula da Dora, a noite é só da tutoria.'},
-    {time:'20:45–21:30', subject:'tutoria', mode:'fechamento', note:'Só revisão leve, sem virar a noite.'}
+    {time:'07:30–08:45', subject:'hm', subtopic:'cardiopneumo', note:'Dora · simulado final em voz alta (última passada, a 6ª vez no assunto). Sem matéria nova hoje.'},
+    {time:'10:45–11:30', subject:'hm', subtopic:'pediatria', note:'Pediatria · reler o tema de hoje (20–30 min) e almoçar com calma.'}
   ],
   sex: [
-    {time:'18:00–18:20', subject:'geral', note:'Resto do dia é descanso. Só organizar o fim de semana.'}
+    {time:'18:00–18:20', subject:'geral', note:'Resto do dia é descanso. Só olhar a semana e marcar se a próxima tutoria é ciclo A ou B (botão nos Blocos).'}
   ],
   sab: [
-    {time:'08:00–09:30', subject:'hm', subtopic:'cardiopneumo', note:'Aprofundar com calma, sem a pressão da aula.'},
-    {time:'09:45–10:45', subject:'morfo', note:'Adiantar o conteúdo da semana que vem.'},
-    {time:'11:00–12:00', subject:'pi', note:'Adiantar o conteúdo da semana que vem.'},
-    {time:'15:00–16:00', subject:'piesf', note:'Colocar em dia.'},
-    {time:'16:15–17:00', subject:'hm', subtopic:'cardiopneumo', note:'Decorar o rodapé.'}
+    {time:'08:00–09:30', subject:'hm', subtopic:'cardiopneumo', note:'Dora · 1ª passada da matéria da próxima aula: entender o porquê, sem tentar decorar. No fim, escreva as perguntas que ela faria.'},
+    {time:'09:45–10:45', subject:'morfo', note:'Morfo · adiantar o roteiro de segunda (ler e entender).'},
+    {time:'11:00–11:45', subject:'pi', note:'PI · adiantar o roteiro de segunda.'},
+    {time:'15:00–15:40', subject:'piesf', note:'PIESF · colocar em dia (é o mais tranquilo, 40 min basta).'}
   ],
   dom: [
-    {time:'08:00–09:30', subject:'hm', subtopic:'cardiopneumo', note:'Continuar aprofundando / decoreba.'},
-    {time:'09:45–10:45', subject:'morfo', note:'Terminar de adiantar pra segunda.'},
-    {time:'11:00–11:45', subject:'pi', note:'Terminar de adiantar pra segunda.'},
-    {time:'15:00–15:30', subject:'tutoria', note:'Só uma olhada no tema da semana.'},
-    {time:'19:00–19:30', subject:'geral', note:'Olhar a semana que vem e ajustar o plano.'}
+    {time:'08:00–09:00', subject:'hm', subtopic:'cardiopneumo', note:'Dora · 2ª vez no assunto: tentar responder as perguntas de ontem SEM olhar; só depois conferir e reler o que travou.'},
+    {time:'09:15–10:00', subject:'morfo', note:'Morfo + PI · puxar da cabeça o que leu ontem (pronto para a aula de amanhã).'},
+    {time:'19:00–19:20', subject:'geral', note:'Olhar a semana: qual ciclo da tutoria, tem prova? Ajustar o plano. Dormir 22h.'}
   ]
 };
+const FOCUS_TUT = {
+  A: { /* abertura terça, fechamento sexta */
+    seg: [{time:'20:30–21:15', subject:'tutoria', mode:'abertura', note:'Abertura de amanhã · leitura leve do problema e dos termos. Não aprofundar.'}],
+    ter: [{time:'19:30–20:45', subject:'tutoria', mode:'fechamento', note:'Fechamento · objetivo 1: Sessão 🧠 Retain (associar → explicar pra criança de 12 anos → emoção → cartões).'}],
+    qua: [
+      {time:'09:15–10:45', subject:'tutoria', mode:'fechamento', note:'Fechamento · objetivo 2 na Sessão 🧠 Retain.'},
+      {time:'14:00–15:15', subject:'tutoria', mode:'fechamento', note:'Fechamento · objetivo 3 na Sessão 🧠 Retain.'},
+      {time:'19:00–20:15', subject:'tutoria', mode:'fechamento', note:'Fechamento · objetivo 4 na Sessão 🧠 Retain (se tiver 5+, o resto vai para amanhã cedo).'}
+    ],
+    qui: [
+      {time:'09:00–10:30', subject:'tutoria', mode:'fechamento', note:'Fechamento · explicar TODOS os objetivos em voz alta, sem olhar (2º dia = é aqui que fixa). Revisar só onde travou.'},
+      {time:'19:00–19:45', subject:'tutoria', mode:'fechamento', note:'Só revisão leve: “Revisão de hoje” do Retain + cartas na manga. Nada de conteúdo novo. Cama às 22h.'}
+    ],
+    sex: [], sab: [], dom: []
+  },
+  B: { /* abertura sexta, fechamento terça */
+    seg: [{time:'20:30–21:30', subject:'tutoria', mode:'fechamento', note:'Fechamento de amanhã · explicar TODOS os objetivos em voz alta, sem olhar (2º dia), revisar só onde travou. Cama às 22h.'}],
+    ter: [{time:'19:30–20:00', subject:'tutoria', mode:'abertura', note:'Novo problema chegou? Só ler o caso por cima. A abertura é sexta.'}],
+    qua: [{time:'14:00–14:45', subject:'tutoria', mode:'geral', note:'“Revisão de hoje” do Retain (cartões do último fechamento) + ler o caso da próxima abertura.'}],
+    qui: [{time:'19:00–19:45', subject:'tutoria', mode:'abertura', note:'Abertura de amanhã · leitura leve do problema e dos termos. Não aprofundar.'}],
+    sex: [],
+    sab: [{time:'16:00–17:15', subject:'tutoria', mode:'fechamento', note:'Fechamento de terça · objetivo 1 na Sessão 🧠 Retain.'}],
+    dom: [
+      {time:'10:15–11:30', subject:'tutoria', mode:'fechamento', note:'Fechamento · objetivo 2 na Sessão 🧠 Retain.'},
+      {time:'15:00–16:15', subject:'tutoria', mode:'fechamento', note:'Fechamento · objetivos 3 e 4 na Sessão 🧠 Retain.'}
+    ]
+  }
+};
+function tutoriaCiclo(){ return state.settings.tutoriaCiclo === 'B' ? 'B' : 'A'; }
+function setTutoriaCiclo(c){ state.settings.tutoriaCiclo = c; saveState(); render(); aviso(c==='B' ? 'Ciclo B: abertura na sexta, fechamento na terça' : 'Ciclo A: abertura na terça, fechamento na sexta'); }
+function focusFor(d){
+  const t = (FOCUS_TUT[tutoriaCiclo()][d] || []);
+  return (FOCUS_COMUM[d] || []).concat(t).sort((a,b)=>(hm2min(String(a.time).split('–')[0])||0)-(hm2min(String(b.time).split('–')[0])||0));
+}
+function cicloToggleHtml(){
+  const c = tutoriaCiclo();
+  return '<div class="ciclo-tg" role="group" aria-label="Ciclo da tutoria desta semana"><span>Tutoria:</span>' +
+    '<button class="'+(c==='A'?'on':'')+'" onclick="setTutoriaCiclo(\'A\')">fechamento sexta</button>' +
+    '<button class="'+(c==='B'?'on':'')+'" onclick="setTutoriaCiclo(\'B\')">fechamento terça</button></div>';
+}
 
 /* ---------- state ---------- */
 
@@ -2064,12 +2095,12 @@ function renderHoje(){
   const dataTxt = hoje.toLocaleDateString('pt-BR',{day:'numeric', month:'long'});
   let html = '<div class="greet"><div><h1>'+greeting()+', Osmar</h1><p>'+DAY_FULL[todayKeyAny()]+', '+dataTxt+'</p></div></div>';
 
-  const focusList = FOCUS[todayKeyAny()] || [];
+  const focusList = focusFor(todayKeyAny());
   const fk = todayFullKey();
   const doneCount = focusList.filter((f,idx)=>state.blocoChecks[blocoCheckKey(fk, idx)]).length;
   const pct = focusList.length ? Math.round(doneCount/focusList.length*100) : 0;
 
-  let blocos = '<div class="card">' + cardHead('target','Blocos de estudo','var(--accent)');
+  let blocos = '<div class="card">' + cardHead('target','Blocos de estudo','var(--accent)') + cicloToggleHtml();
   if(focusList.length){
     blocos += '<div class="prog"><div class="track"><div class="fill" style="width:'+pct+'%"></div></div><span class="n">'+doneCount+'/'+focusList.length+'</span></div>';
     blocos += focusList.map((f,idx)=>renderFocusItem(f, idx, fk)).join('');
@@ -2271,9 +2302,9 @@ function renderSemana(){
   html += '</div>';
 
   const fk = todayKeyAny();
-  html += '<div class="card">' + cardHead('target','Blocos de estudo por dia','var(--accent)');
+  html += '<div class="card">' + cardHead('target','Blocos de estudo por dia','var(--accent)') + cicloToggleHtml() + '<div class="hint" style="margin:0 0 10px">Plano espaçado: a Dora começa no sábado e volta todo dia um pouquinho; o fechamento é dividido em 3 dias e a véspera é só revisão. Estudar tudo de uma vez na véspera faz esquecer rápido.</div>';
   html += DAY_ORDER_ALL.map(d=>{
-    const inner = (FOCUS[d]||[]).map((f,idx)=>renderFocusItem(f, idx, null)).join('');
+    const inner = focusFor(d).map((f,idx)=>renderFocusItem(f, idx, null)).join('');
     return '<h3>'+DAY_FULL[d]+(d===fk?' <span class="today-tag">· hoje</span>':'')+'</h3>' + inner;
   }).join('');
   html += '</div>';
@@ -2510,7 +2541,7 @@ function blocosNaoFeitos(dayKey){
   if(!marcou) return null;
   const d = new Date(dayKey+'T12:00:00');
   const map = {0:'dom',1:'seg',2:'ter',3:'qua',4:'qui',5:'sex',6:'sab'};
-  const lista = FOCUS[map[d.getDay()]] || [];
+  const lista = focusFor(map[d.getDay()]);
   const falt = lista.filter((f,idx)=>!state.blocoChecks[blocoCheckKey(dayKey, idx)]);
   return falt.length ? {falt, total:lista.length} : null;
 }
