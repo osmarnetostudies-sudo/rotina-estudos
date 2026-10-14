@@ -522,6 +522,77 @@ table.tt td.today-col{background:color-mix(in srgb,var(--accent) 10%,var(--surfa
 .aviso{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:11px 18px;border-radius:12px;font-size:14px;font-weight:500;z-index:80;max-width:calc(100% - 32px);box-shadow:0 10px 30px rgba(0,0,0,.3);}
 textarea.importar{min-height:90px;font:12.5px var(--mono);}
 
+/* ---------- notas ---------- */
+.n-in{width:46px!important;padding:7px 4px!important;text-align:center;font:600 14px var(--mono)!important;font-variant-numeric:tabular-nums;}
+.n-in.med{width:58px!important;border-style:dashed!important;}
+.n-in.xs{width:52px!important;}
+.n-in::placeholder{color:var(--ink-3);font-weight:500;}
+.n-tiles{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);gap:12px;}
+.n-tile{background:var(--surface-2);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;border-top:3px solid var(--c);min-width:0;}
+.n-t-lbl{display:flex;align-items:center;gap:7px;font:600 11.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);}
+.n-t-lbl .ic{color:var(--c);}
+.n-t-row{display:flex;gap:28px;flex-wrap:wrap;}
+.n-t-num{font:800 34px/1 var(--display);letter-spacing:-.03em;font-variant-numeric:tabular-nums;}
+.n-t-cap{font-size:12px;color:var(--ink-3);margin-top:3px;}
+.n-t-sub{font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.n-ok{color:var(--good);font-weight:600;display:inline-flex;align-items:center;gap:5px;}
+.n-bad{color:var(--crit);font-weight:600;display:inline-flex;align-items:center;gap:5px;}
+.n-mini{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink-2);align-items:center;}
+.n-mini span{display:inline-flex;align-items:center;gap:6px;}
+.n-bar{position:relative;height:10px;border-radius:999px;background:var(--sunken);}
+.n-bar-fill{height:100%;border-radius:999px;transition:width .3s;}
+.n-bar-mark{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--ink-2);border-radius:2px;opacity:.7;}
+.n-mods{display:flex;gap:8px;flex-wrap:wrap;}
+.n-mod{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);min-width:120px;}
+.n-mod.on{border-color:var(--s2);box-shadow:0 0 0 2px color-mix(in srgb,var(--s2) 25%,transparent);}
+.n-mod-n{font-weight:700;font-size:14px;}
+.n-mod-v{font:700 13px var(--mono);}
+.n-probs{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;}
+.n-prob{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;}
+.n-prob.vazio{opacity:.62;}
+.n-prob.vazio:focus-within{opacity:1;}
+.n-prob-h{display:flex;align-items:center;gap:8px;font-size:14px;}
+.n-big{font:800 22px/1 var(--display);font-variant-numeric:tabular-nums;}
+.n-big.sm{font-size:19px;}
+.n-pl{display:flex;align-items:center;gap:6px;}
+.n-pl-l{width:86px;font-size:13px;color:var(--ink-2);font-weight:600;flex:none;}
+.n-abbtn{margin-left:auto;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-3);border-radius:8px;padding:5px 8px;font:600 11.5px var(--mono);}
+.n-abbtn.on{background:var(--s4);border-color:var(--s4);color:#fff;}
+.n-abtxt{font-size:13px;color:var(--s4);font-weight:600;padding:7px 0;}
+.n-comp{display:flex;flex-direction:column;margin-bottom:10px;}
+.n-crow{display:grid;grid-template-columns:minmax(0,1fr) 62px 62px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);}
+.n-crow.tot{border-bottom:none;font-weight:700;}
+.n-cn{font-size:14px;display:flex;flex-direction:column;}
+.n-cn small,.field small{font-size:11.5px;color:var(--ink-3);font-weight:500;display:block;}
+.n-modgrid .field > span:first-child{flex-direction:column;align-items:flex-start!important;gap:0!important;}
+.n-cv,.n-cp{font:700 14px var(--mono);text-align:right;font-variant-numeric:tabular-nums;}
+.n-crow.tot .n-cp{font:800 22px var(--display);}
+.n-alert,.n-good,.n-info{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:10px;font-size:13.5px;margin-top:10px;line-height:1.4;}
+.n-alert{background:color-mix(in srgb,var(--crit) 12%,transparent);color:var(--ink);}
+.n-alert .ic{color:var(--crit);margin-top:2px;}
+.n-good{background:color-mix(in srgb,var(--good) 12%,transparent);}
+.n-good .ic{color:var(--good);margin-top:2px;}
+.n-info{background:var(--surface-2);}
+.n-info .ic{color:var(--accent);margin-top:2px;}
+.n-labs{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;}
+.n-labs .row{gap:6px;flex-wrap:nowrap;}
+.n-hm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.n-hmd{border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0;}
+.n-hmd-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:14px;}
+.n-fhead,.n-frow{display:grid;grid-template-columns:18px repeat(3,minmax(0,1fr)) minmax(0,1.25fr) 34px;gap:4px;align-items:center;}
+.n-fhead{font:600 10.5px var(--mono);color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;padding:0 0 4px;}
+.n-frow{padding:3px 0;}
+.n-frow .n-in{width:100%!important;}
+.n-frow.ab .n-abtxt{grid-column:2 / 6;}
+.n-fi{font:600 12px var(--mono);color:var(--ink-3);}
+.n-frow .n-abbtn{margin:0;padding:5px 0;}
+.n-sum{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
+.n-sum label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2);font-weight:600;}
+.n-sum .n-in{width:64px!important;}
+@media (max-width:1100px){ .n-hm{grid-template-columns:minmax(0,1fr);} }
+@media (max-width:860px){ .n-tiles{grid-template-columns:minmax(0,1fr) minmax(0,1fr);} .n-tile.big{grid-column:1 / -1;} }
+@media (max-width:420px){ .n-tiles{grid-template-columns:minmax(0,1fr);} .n-pl-l{width:74px;font-size:12.5px;} .n-in{width:42px!important;} .n-t-num{font-size:30px;} }
+
 /* ---------- telas menores ---------- */
 @media (max-width:860px){
   .hoje-grid,.grid2{grid-template-columns:minmax(0,1fr);}
@@ -534,7 +605,7 @@ textarea.importar{min-height:90px;font:12.5px var(--mono);}
 @media (max-width:640px){
   .dock nav.tabs{display:none;}
   .dock{box-shadow:none;border-bottom:none;}
-  nav.bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;
+  nav.bottom{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;
     background:var(--surface);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 24px -18px rgba(0,0,0,.5);}
   nav.bottom button{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--ink-3);font-size:11px;font-weight:600;padding:5px 0;position:relative;}
   nav.bottom button .ic{width:22px;height:22px;}
@@ -706,6 +777,7 @@ function defaultState(){
     historico: [],
     sync: {code:null},
     gradeExtras: [],
+    notas: notasSeed(),
     localAt: 0,
     ui: {tab:'hoje', theme:null}
   };
@@ -736,6 +808,7 @@ function loadState(){
   merged.blocoChecks = raw.blocoChecks || {};
   merged.historico = Array.isArray(raw.historico) ? raw.historico : [];
   merged.gradeExtras = Array.isArray(raw.gradeExtras) ? raw.gradeExtras : [];
+  merged.notas = (raw.notas && Array.isArray(raw.notas.modulos)) ? raw.notas : notasSeed();
   merged.sync = Object.assign({code:null}, raw.sync);
   return merged;
 }
@@ -750,7 +823,7 @@ function uid(){ return Date.now().toString(36) + Math.random().toString(36).slic
 
 /* ---------- sincronização entre aparelhos (Firebase, pelo código) ---------- */
 
-const SYNC_FIELDS = ['subjects','settings','sessions','dailyReviews','tasks','blocoChecks','historico','gradeExtras'];
+const SYNC_FIELDS = ['subjects','settings','sessions','dailyReviews','tasks','blocoChecks','historico','gradeExtras','notas'];
 let applyingRemote = false;
 let syncStatus = {txt:'sem sincronização', cls:'erro'};
 
@@ -1532,6 +1605,7 @@ const ICONS = {
   arrowDown:'<path d="M12 5v14M19 12l-7 7-7-7"/>',
   trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
   pin:'<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
+  grad:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
   sparkle:'<path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/>'
 };
 function ic(n, cls){ return '<svg class="ic'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[n]||'')+'</svg>'; }
@@ -1681,7 +1755,7 @@ function renderHeader(){
   );
 }
 
-const TABS = [['hoje','Hoje','activity'],['tarefas','Tarefas','list'],['semana','Semana','calendar'],['progresso','Progresso','chart'],['config','Ajustes','sliders']];
+const TABS = [['hoje','Hoje','activity'],['tarefas','Tarefas','list'],['semana','Semana','calendar'],['progresso','Progresso','chart'],['notas','Notas','grad'],['config','Ajustes','sliders']];
 function renderTabsNav(kind){
   const pend = state.tasks.filter(t=>!t.done && !t.failed).length;
   return '<nav class="'+kind+'" aria-label="Seções">' + TABS.map(t=>{
@@ -1739,6 +1813,7 @@ function renderTab(){
   if(state.ui.tab==='tarefas') return renderTarefas();
   if(state.ui.tab==='semana') return renderSemana();
   if(state.ui.tab==='progresso') return renderProgresso();
+  if(state.ui.tab==='notas') return renderNotas();
   if(state.ui.tab==='config') return renderConfig();
   return '';
 }
@@ -2635,6 +2710,296 @@ function renderConfig(){
   return html;
 }
 
+
+
+/* ---------- notas (mesmas contas da planilha "Planilha de notas 2º ano") ---------- */
+
+const NOTA_MIN = 5.75;   // abaixo disso no módulo de tutoria + Morfo/PI precisa de aceleração
+const PESOS = {prob:0.5, prova:0.2, pratica:0.18, escrita:0.12, acel:0.3};
+const HM_DISC = [['ger','Geriatria'],['go','Ginecologia e Obstetrícia'],['ped','Pediatria']];
+
+function probVazio(){ return {ab:['','',''], fe:['','',''], abA:false, abF:false}; }
+function formVazia(){ return {n:['','',''], media:'', abono:false}; }
+function hmDiscVazia(){ const f=[]; for(let i=0;i<7;i++) f.push(formVazia()); return {form:f, mediaForm:'', prova:''}; }
+function moduloVazio(id, nome){
+  const p=[]; for(let i=0;i<7;i++) p.push(probVazio());
+  return {id, nome, problemas:p, provaTutoria:'', labs:['','',''], escrita:'', mediaMFPI:'', aceleracao:''};
+}
+function notasSeed(){
+  const P = (ab, fe, abF)=>({ab:ab.map(String), fe:fe?fe.map(String):['','',''], abA:false, abF:!!abF});
+  const m1 = moduloVazio('m1','Pediatria');
+  [P([7,8,8],[0,0,0]), P([8,7,7],[8,7,8]), P([8,7,7],[8,8,7]), P([7,7,6],[8,7,8]), P([7,7,6],null,true), P([7,7,7],[8,7,7])]
+    .forEach((x,i)=>{ m1.problemas[i]=x; });
+  m1.provaTutoria='4'; m1.escrita='4,375'; m1.mediaMFPI='4,78'; m1.aceleracao='7,8';
+  const m2 = moduloVazio('m2','Neurologia');
+  [P([8,7,8],[6,6,7]), P([7,6,7],[0,0,0]), P([8,6,7],[6,6,7]), P([6,5,7],[6,5,6]), P([7,6,7]), P([7,6,7])]
+    .forEach((x,i)=>{ m2.problemas[i]=x; });
+  const m3 = moduloVazio('m3','Geriatria');
+  const hm1 = {ger:hmDiscVazia(), go:hmDiscVazia(), ped:hmDiscVazia()};
+  hm1.ger.form[0].media='0'; hm1.ger.form[1].media='5,34'; hm1.ger.form[2].n=['8','4,5','5,5'];
+  hm1.ger.form[3].media='3,87'; hm1.ger.form[4].abono=true;
+  hm1.ger.mediaForm='4,24'; hm1.ger.prova='5';
+  hm1.go.mediaForm='7,36'; hm1.go.prova='6,5';
+  hm1.ped.mediaForm='7,38'; hm1.ped.prova='7';
+  const hm2 = {ger:hmDiscVazia(), go:hmDiscVazia(), ped:hmDiscVazia()};
+  return {versao:1, moduloAtual:'m2', modulos:[m1,m2,m3], hm:[hm1,hm2], piesf:['','']};
+}
+
+/* número digitado (aceita vírgula); '' ou inválido = null */
+function nv(s){
+  if(s===null || s===undefined) return null;
+  const t = String(s).trim().replace(',','.');
+  if(t==='') return null;
+  const n = Number(t);
+  return isFinite(n) ? n : null;
+}
+function fmtN(n, casas){
+  if(n===null || n===undefined || !isFinite(n)) return '—';
+  return n.toLocaleString('pt-BR',{minimumFractionDigits:casas===undefined?2:casas, maximumFractionDigits:casas===undefined?2:casas});
+}
+function media(arr){ const v = arr.filter(x=>x!==null); return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null; }
+
+/* Problema: (soma das 3 notas da abertura + soma das 3 do fechamento) / 6.
+   Parte com abono sai da conta (divide por 3). Parte ainda sem nota nenhuma fica "pendente"
+   e não entra (na planilha ela contava como zero até você lançar). */
+function probInfo(p){
+  const parte = (notas, abono)=>{
+    if(abono) return {st:'abono'};
+    const v = notas.map(nv);
+    if(v.every(x=>x===null)) return {st:'pend'};
+    return {st:'ok', soma:v.reduce((a,b)=>a+(b||0),0)};
+  };
+  const a = parte(p.ab, p.abA), f = parte(p.fe, p.abF);
+  const ok = [a,f].filter(x=>x.st==='ok');
+  if(!ok.length) return {media:null, st:(a.st==='pend'&&f.st==='pend')?'vazio':'pend', a, f};
+  const m = ok.reduce((s,x)=>s+x.soma,0)/(ok.length*3);
+  const pend = a.st==='pend' || f.st==='pend';
+  return {media:m, st: pend?'parcial':'completo', a, f};
+}
+
+function modInfo(m){
+  const probs = m.problemas.map(probInfo);
+  const comMedia = probs.filter(x=>x.media!==null);
+  const probAvg = media(comMedia.map(x=>x.media));
+  const parciais = probs.filter(x=>x.st==='parcial').length;
+  const prova = nv(m.provaTutoria);
+  const escrita = nv(m.escrita);
+  const labs = m.labs.map(nv);
+  const mediaMFPI = nv(m.mediaMFPI);
+  let pratica = null, praticaDe = '';
+  if(labs.some(x=>x!==null)){ pratica = labs.reduce((a,b)=>a+(b||0),0); praticaDe='provinhas'; }
+  else if(mediaMFPI!==null && escrita!==null){ pratica = (mediaMFPI*(PESOS.pratica+PESOS.escrita) - escrita*PESOS.escrita)/PESOS.pratica; praticaDe='média informada'; }
+  const comp = [
+    {k:'prob', nome:'Média dos problemas', nota:probAvg, peso:PESOS.prob},
+    {k:'prova', nome:'Prova de tutoria', nota:prova, peso:PESOS.prova},
+    {k:'pratica', nome:'Prova prática · MF e PI', nota:pratica, peso:PESOS.pratica},
+    {k:'escrita', nome:'Prova escrita · MF e PI', nota:escrita, peso:PESOS.escrita}
+  ];
+  comp.forEach(c=>{ c.pts = c.nota===null ? null : c.nota*c.peso; });
+  const pts = comp.reduce((s,c)=>s+(c.pts||0),0);
+  const faltando = comp.filter(c=>c.nota===null);
+  const completo = !faltando.length;
+  let precisa = null;   // quanto precisa tirar no que falta (quando só falta 1 coisa)
+  if(faltando.length===1){ const c = faltando[0]; precisa = {comp:c, nota:(NOTA_MIN - pts)/c.peso}; }
+  const acel = nv(m.aceleracao);
+  const finalAcel = (acel!==null && probAvg!==null && prova!==null) ? probAvg*PESOS.prob + prova*PESOS.prova + acel*PESOS.acel : null;
+  const precisaAcel = (completo && pts<NOTA_MIN && probAvg!==null && prova!==null) ? (NOTA_MIN - probAvg*PESOS.prob - prova*PESOS.prova)/PESOS.acel : null;
+  const mfpiMedia = (pratica!==null && escrita!==null) ? (pratica*PESOS.pratica + escrita*PESOS.escrita)/(PESOS.pratica+PESOS.escrita) : mediaMFPI;
+  let finalOficial = completo ? pts : null;
+  if(completo && pts<NOTA_MIN && finalAcel!==null) finalOficial = finalAcel;
+  return {probs, probAvg, parciais, comp, pts, faltando, completo, precisa, acel, finalAcel, precisaAcel, pratica, praticaDe, mfpiMedia, finalOficial,
+          nProbs: comMedia.length};
+}
+
+function hmFormMedia(f){
+  if(f.abono) return null;
+  const o = nv(f.media);
+  if(o!==null) return o;
+  return media(f.n.map(nv));
+}
+function hmDiscInfo(d){
+  const medias = d.form.map(hmFormMedia);
+  const auto = media(medias);
+  const over = nv(d.mediaForm);
+  const mf = over!==null ? over : auto;
+  const prova = nv(d.prova);
+  const fin = media([mf, prova]);
+  return {medias, auto, over, mf, prova, final: fin, nForm: medias.filter(x=>x!==null).length};
+}
+function hmBimInfo(b){
+  const disc = {}; HM_DISC.forEach(([k])=>{ disc[k] = hmDiscInfo(b[k]); });
+  return {disc, media: media(HM_DISC.map(([k])=>disc[k].final))};
+}
+
+/* ---- edição ---- */
+function nget(path){
+  let o = state.notas; const ps = path.split('.');
+  for(let i=0;i<ps.length-1;i++) o = o[isNaN(ps[i])?ps[i]:+ps[i]];
+  return {o, k: isNaN(ps[ps.length-1]) ? ps[ps.length-1] : +ps[ps.length-1]};
+}
+let notasRT = null;
+function notasRender(){
+  clearTimeout(notasRT);
+  notasRT = setTimeout(()=>{
+    const ae = document.activeElement, id = ae && ae.id;
+    const sel = (ae && typeof ae.selectionStart==='number') ? [ae.selectionStart, ae.selectionEnd] : null;
+    const y = window.scrollY;
+    render();
+    window.scrollTo(0, y);
+    if(id){ const el = document.getElementById(id); if(el){ el.focus({preventScroll:true}); if(sel && el.setSelectionRange) try{ el.setSelectionRange(sel[0], sel[1]); }catch(e){} } }
+  }, 0);
+}
+function nset(path, val){
+  const v = String(val||'').trim();
+  if(v!=='' && nv(v)===null){ aviso('Digite só o número (ex.: 7,5).'); notasRender(); return; }
+  if(nv(v)!==null && (nv(v)<0 || nv(v)>10)){ aviso('A nota vai de 0 a 10.'); notasRender(); return; }
+  const r = nget(path); r.o[r.k] = v;
+  saveState(); notasRender();
+}
+function ntoggle(path){ const r = nget(path); r.o[r.k] = !r.o[r.k]; saveState(); notasRender(); }
+function setModuloAtual(id){ state.notas.moduloAtual = id; saveState(); render(); }
+function setNotasBim(i){ state.ui.notasBim = i; saveState(); render(); }
+
+function nIn(path, val, ph, cls){
+  const id = 'n-'+path.replace(/\./g,'-');
+  return '<input type="text" inputmode="decimal" autocomplete="off" class="n-in'+(cls?' '+cls:'')+'" id="'+id+'" value="'+escapeHtml(val||'')+'"'+(ph?' placeholder="'+escapeHtml(ph)+'"':'')+' onchange="nset(\''+path+'\', this.value)" onkeydown="if(event.key===\'Enter\'){this.blur();}">';
+}
+function notaCor(n){
+  if(n===null) return 'var(--ink-3)';
+  if(n>=7) return 'var(--good)';
+  if(n>=NOTA_MIN) return 'var(--warn)';
+  return 'var(--crit)';
+}
+function notaBar(n, comMarca){
+  const pct = n===null ? 0 : Math.max(0, Math.min(100, n*10));
+  return '<div class="n-bar"><div class="n-bar-fill" style="width:'+pct+'%;background:'+notaCor(n)+'"></div>'+
+    (comMarca?'<span class="n-bar-mark" style="left:'+(NOTA_MIN*10)+'%" title="Mínimo '+fmtN(NOTA_MIN)+'"></span>':'')+'</div>';
+}
+
+/* ---- tela ---- */
+function renderNotas(){
+  const N = state.notas;
+  const mods = N.modulos.map(m=>({m, i:modInfo(m)}));
+  const atual = mods.find(x=>x.m.id===N.moduloAtual) || mods[0];
+  const bim = state.ui.notasBim===1 ? 1 : 0;
+  const hmB = N.hm.map(hmBimInfo);
+  const piesf = N.piesf.map(nv);
+
+  /* painel */
+  const ai = atual.i;
+  const valorPainel = ai.completo ? ai.finalOficial : ai.pts;
+  let html = '<div class="card n-painel">' + cardHead('grad','Painel de notas','var(--accent)', '<span class="badge soft">2º ano</span>');
+  html += '<div class="n-tiles">';
+  // tile tutoria
+  let sub;
+  if(ai.completo){
+    sub = ai.pts>=NOTA_MIN ? '<span class="n-ok">'+ic('check')+'Passou direto (mín. '+fmtN(NOTA_MIN)+')</span>'
+      : (ai.finalAcel!==null ? '<span class="'+(ai.finalAcel>=NOTA_MIN?'n-ok':'n-bad')+'">'+ic(ai.finalAcel>=NOTA_MIN?'check':'alert')+'Com aceleração: '+fmtN(ai.finalAcel)+'</span>'
+        : '<span class="n-bad">'+ic('alert')+'Abaixo de '+fmtN(NOTA_MIN)+' · precisa de '+fmtN(ai.precisaAcel)+' na aceleração</span>');
+  } else {
+    sub = '<span class="muted">'+fmtN(ai.pts)+' pontos já garantidos · faltam '+ai.faltando.map(c=>c.nome.split(' · ')[0].toLowerCase()).join(', ')+'</span>';
+  }
+  html += '<div class="n-tile big" style="--c:var(--s2)">' +
+    '<div class="n-t-lbl">'+ic('users')+'Tutoria + Morfo/PI · '+escapeHtml(atual.m.nome)+'</div>' +
+    '<div class="n-t-row"><div><div class="n-t-num" style="color:'+notaCor(ai.probAvg)+'">'+fmtN(ai.probAvg)+'</div><div class="n-t-cap">média dos problemas</div></div>' +
+    '<div><div class="n-t-num" style="color:'+(ai.completo?notaCor(ai.finalOficial):'var(--ink-2)')+'">'+fmtN(valorPainel)+'</div><div class="n-t-cap">'+(ai.completo?'média final':'pontos até agora')+'</div></div></div>' +
+    notaBar(valorPainel, true) +
+    '<div class="n-t-sub">'+sub+'</div>' +
+    (ai.precisa && ai.precisa.comp.k!=='prob' ? '<div class="n-t-sub">'+ic('target')+'Pra fechar '+fmtN(NOTA_MIN)+', precisa de <b>'+(ai.precisa.nota<=0?'qualquer nota':(ai.precisa.nota>10?'mais que 10 (vai pra aceleração)':fmtN(ai.precisa.nota)))+'</b> na '+ai.precisa.comp.nome.toLowerCase()+'</div>' : '') +
+  '</div>';
+  // tile HM
+  const hb = hmB[bim];
+  html += '<div class="n-tile" style="--c:var(--s1)"><div class="n-t-lbl">'+ic('stethoscope')+'Habilidades Médicas · '+(bim+1)+'º bim</div>' +
+    '<div class="n-t-num" style="color:'+notaCor(hb.media)+'">'+fmtN(hb.media)+'</div>' + notaBar(hb.media) +
+    '<div class="n-mini">'+HM_DISC.map(([k,nome])=>'<span>'+nome.split(' ')[0]+' <b style="color:'+notaCor(hb.disc[k].final)+'">'+fmtN(hb.disc[k].final)+'</b></span>').join('')+'</div></div>';
+  // tile PIESF
+  const pm = media(piesf);
+  html += '<div class="n-tile" style="--c:var(--s3)"><div class="n-t-lbl">'+ic('homeheart')+'PIESF</div>' +
+    '<div class="n-t-num" style="color:'+notaCor(pm)+'">'+fmtN(pm)+'</div>' + notaBar(pm) +
+    '<div class="n-mini"><span>1º bim '+nIn('piesf.0', N.piesf[0], '—','xs')+'</span><span>2º bim '+nIn('piesf.1', N.piesf[1], '—','xs')+'</span></div></div>';
+  html += '</div>';
+  // módulos do semestre
+  html += '<h3>Módulos de tutoria + Morfo/PI</h3><div class="n-mods">' + mods.map(x=>{
+    const v = x.i.completo ? x.i.finalOficial : null;
+    const on = x.m.id===atual.m.id;
+    return '<button class="n-mod'+(on?' on':'')+'" onclick="setModuloAtual(\''+x.m.id+'\')"><span class="n-mod-n">'+escapeHtml(x.m.nome)+'</span>' +
+      '<span class="n-mod-v" style="color:'+notaCor(v!==null?v:x.i.probAvg)+'">'+(v!==null?fmtN(v):(x.i.nProbs?'em curso':'—'))+'</span></button>';
+  }).join('') + '</div>';
+  html += '</div>';
+
+  /* módulo atual detalhado */
+  html += renderModuloNotas(atual.m, ai, N.modulos.indexOf(atual.m));
+
+  /* HM */
+  html += '<div class="card" style="margin-top:16px">' + cardHead('stethoscope','Habilidades Médicas · formativas','var(--s1)',
+    '<div class="seg"><button class="'+(bim===0?'on-good':'')+'" onclick="setNotasBim(0)">1º bim</button><button class="'+(bim===1?'on-good':'')+'" onclick="setNotasBim(1)">2º bim</button></div>');
+  html += '<div class="hint">Cada formativa: as 3 notas viram a média do dia sozinhas. Se o professor deu só a média, digite em "média". Abono não entra na conta. Média final = (média das formativas + prova) ÷ 2.</div>';
+  html += '<div class="n-hm">' + HM_DISC.map(([k,nome])=>{
+    const d = N.hm[bim][k], inf = hb.disc[k], base = 'hm.'+bim+'.'+k;
+    let rows = d.form.map((f,fi)=>{
+      const mAuto = media(f.n.map(nv));
+      return '<div class="n-frow'+(f.abono?' ab':'')+'"><span class="n-fi">'+(fi+1)+'</span>' +
+        (f.abono ? '<span class="n-abtxt">Abono</span>' :
+          f.n.map((v,j)=>nIn(base+'.form.'+fi+'.n.'+j, v, '')).join('') + nIn(base+'.form.'+fi+'.media', f.media, mAuto===null?'média':fmtN(mAuto), 'med')) +
+        '<button class="n-abbtn'+(f.abono?' on':'')+'" onclick="ntoggle(\''+base+'.form.'+fi+'.abono\')" title="Abono">Ab</button></div>';
+    }).join('');
+    return '<div class="n-hmd"><div class="n-hmd-h"><b>'+nome+'</b><span class="n-big" style="color:'+notaCor(inf.final)+'">'+fmtN(inf.final)+'</span></div>' +
+      '<div class="n-fhead"><span>#</span><span>N1</span><span>N2</span><span>N3</span><span>média</span><span></span></div>' + rows +
+      '<div class="n-sum"><label>Média das formativas '+nIn(base+'.mediaForm', d.mediaForm, inf.auto===null?'auto':fmtN(inf.auto))+'</label>' +
+      '<label>Prova '+nIn(base+'.prova', d.prova, '—')+'</label></div>' +
+      (inf.over!==null && inf.auto!==null && Math.abs(inf.over-inf.auto)>0.005 ? '<div class="hint" style="margin:6px 0 0">Calculada pelas formativas: '+fmtN(inf.auto)+' · está valendo a que você digitou ('+fmtN(inf.over)+'). Apague pra usar a calculada.</div>' : '') +
+    '</div>';
+  }).join('') + '</div>';
+  const sem = HM_DISC.map(([k,nome])=>{ const v = media(hmB.map(b=>b.disc[k].final)); return '<span>'+nome+': <b style="color:'+notaCor(v)+'">'+fmtN(v)+'</b></span>'; }).join('');
+  html += '<div class="n-mini" style="margin-top:12px">'+ic('calendar')+'<span><b>Semestre</b> (média dos 2 bimestres):</span>'+sem+'</div>';
+  html += '</div>';
+  return html;
+}
+
+function renderModuloNotas(m, I, mi){
+  const base = 'modulos.'+mi;
+  let html = '<div class="grid2 n-modgrid" style="margin-top:16px">';
+  // problemas
+  html += '<div class="card">' + cardHead('users','Problemas · '+escapeHtml(m.nome),'var(--s2)', '<span class="badge soft">média '+fmtN(I.probAvg)+'</span>');
+  html += '<div class="hint">3 notas na abertura e 3 no fechamento. Média do problema = soma das 6 ÷ 6. "Ab" = abono (aquela parte sai da conta). Falta sem abono = lance 0.</div>';
+  html += '<div class="n-probs">' + m.problemas.map((p,pi)=>{
+    const inf = I.probs[pi], pb = base+'.problemas.'+pi;
+    const linha = (lbl, key, abKey)=>{
+      const ab = p[abKey];
+      return '<div class="n-pl'+(ab?' ab':'')+'"><span class="n-pl-l">'+lbl+'</span>' +
+        (ab ? '<span class="n-abtxt">Abono</span>' : p[key].map((v,j)=>nIn(pb+'.'+key+'.'+j, v, '')).join('')) +
+        '<button class="n-abbtn'+(ab?' on':'')+'" onclick="ntoggle(\''+pb+'.'+abKey+'\')" title="Abono">Ab</button></div>';
+    };
+    const tag = inf.st==='parcial' ? '<span class="badge warn">falta '+(inf.a.st==='pend'?'abertura':'fechamento')+'</span>' : '';
+    return '<div class="n-prob'+(inf.st==='vazio'?' vazio':'')+'"><div class="n-prob-h"><b>Problema '+(pi+1)+'</b>'+tag+'<span class="spacer"></span><span class="n-big sm" style="color:'+notaCor(inf.media)+'">'+fmtN(inf.media)+'</span></div>' +
+      linha('Abertura','ab','abA') + linha('Fechamento','fe','abF') + '</div>';
+  }).join('') + '</div>';
+  if(I.parciais) html += '<div class="hint" style="margin:10px 0 0">'+ic('alert')+' '+I.parciais+' problema'+(I.parciais>1?'s':'')+' com parte pendente: a média dele usa só o que já tem nota. Quando sair a nota (ou o zero, se faltou), lance aqui.</div>';
+  html += '</div>';
+
+  // composição
+  html += '<div class="card">' + cardHead('target','Média final do módulo','var(--accent)');
+  html += '<div class="n-comp">' + I.comp.map(c=>{
+    return '<div class="n-crow"><span class="n-cn">'+c.nome+'<small>peso '+Math.round(c.peso*100)+'%</small></span>' +
+      '<span class="n-cv" style="color:'+notaCor(c.nota)+'">'+fmtN(c.nota)+'</span><span class="n-cp">'+(c.pts===null?'—':'+'+fmtN(c.pts))+'</span></div>';
+  }).join('') +
+  '<div class="n-crow tot"><span class="n-cn">'+(I.completo?'Média final':'Pontos até agora')+'</span><span></span><span class="n-cp" style="color:'+(I.completo?notaCor(I.pts):'var(--ink)')+'">'+fmtN(I.pts)+'</span></div></div>';
+  html += notaBar(I.pts, true);
+  if(I.completo && I.pts<NOTA_MIN) html += '<div class="n-alert">'+ic('alert')+'Abaixo de '+fmtN(NOTA_MIN)+': precisa de aceleração de Morfo + PI. Pra passar, a aceleração precisa ser pelo menos <b>'+fmtN(Math.max(0,I.precisaAcel))+'</b>.</div>';
+  else if(I.completo) html += '<div class="n-good">'+ic('check')+'Passou direto (mínimo '+fmtN(NOTA_MIN)+').</div>';
+  else if(I.precisa && I.precisa.comp.k!=='prob') html += '<div class="n-info">'+ic('target')+'Pra chegar em '+fmtN(NOTA_MIN)+', precisa de <b>'+(I.precisa.nota<=0?'qualquer nota':(I.precisa.nota>10?'mais que 10':fmtN(I.precisa.nota)))+'</b> na '+I.precisa.comp.nome.toLowerCase()+'.</div>';
+
+  html += '<h3>Lançar</h3>';
+  html += '<label class="field"><span>Prova de tutoria</span>'+nIn(base+'.provaTutoria', m.provaTutoria, '—')+'</label>';
+  html += '<label class="field"><span>Prova escrita · MF e PI</span>'+nIn(base+'.escrita', m.escrita, '—')+'</label>';
+  html += '<div class="field n-labs"><span>Provinhas de laboratório<small>somadas viram a prova prática</small></span><span class="row">'+m.labs.map((v,j)=>nIn(base+'.labs.'+j, v, 'L'+(j+1))).join('')+'</span></div>';
+  html += '<label class="field"><span>Média final MF e PI informada<small>se não houver provinhas, a prática sai daqui</small></span>'+nIn(base+'.mediaMFPI', m.mediaMFPI, '—')+'</label>';
+  html += '<label class="field"><span>Aceleração Morfo + PI<small>substitui os 30% de MF/PI</small></span>'+nIn(base+'.aceleracao', m.aceleracao, '—')+'</label>';
+  if(I.finalAcel!==null) html += '<div class="n-info">'+ic('sparkle')+'Com aceleração: '+fmtN(I.probAvg)+'×50% + '+fmtN(nv(m.provaTutoria))+'×20% + '+fmtN(I.acel)+'×30% = <b>'+fmtN(I.finalAcel)+'</b></div>';
+  if(I.praticaDe==='média informada') html += '<div class="hint" style="margin:8px 0 0">Prova prática calculada a partir da média informada: '+fmtN(I.pratica)+'.</div>';
+  html += '</div></div>';
+  return html;
+}
 
 /* ---------- init ---------- */
 
