@@ -579,11 +579,11 @@ textarea.importar{min-height:90px;font:12.5px var(--mono);}
 .n-hm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
 .n-hmd{border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0;}
 .n-hmd-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:14px;}
-.n-fhead,.n-frow{display:grid;grid-template-columns:18px repeat(3,minmax(0,1fr)) minmax(0,1.25fr) 34px;gap:4px;align-items:center;}
+.n-fhead,.n-frow{display:grid;grid-template-columns:18px repeat(4,minmax(0,1fr)) minmax(0,1.25fr) 34px;gap:4px;align-items:center;}
 .n-fhead{font:600 10.5px var(--mono);color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;padding:0 0 4px;}
 .n-frow{padding:3px 0;}
 .n-frow .n-in{width:100%!important;}
-.n-frow.ab .n-abtxt{grid-column:2 / 6;}
+.n-frow.ab .n-abtxt{grid-column:2 / 7;}
 .n-fi{font:600 12px var(--mono);color:var(--ink-3);}
 .n-frow .n-abbtn{margin:0;padding:5px 0;}
 .n-sum{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
@@ -2729,11 +2729,13 @@ function notasFix(N){
   const b2 = N.hm[1];
   if(!b2.pneumo){ b2.pneumo = b2.ger || hmDiscVazia(); delete b2.ger; }
   N.hm.forEach((b,bi)=>{ hmDisc(bi).forEach(([k])=>{ if(!b[k]) b[k] = hmDiscVazia(); }); });
+  /* formativas de HM têm 4 notas (N1 a N4) */
+  N.hm.forEach(b=>Object.keys(b).forEach(k=>{ (b[k].form||[]).forEach(f=>{ if(!Array.isArray(f.n)) f.n=[]; while(f.n.length<4) f.n.push(''); }); }));
   return N;
 }
 
 function probVazio(){ return {ab:['','',''], fe:['','',''], abA:false, abF:false}; }
-function formVazia(){ return {n:['','',''], media:'', abono:false}; }
+function formVazia(){ return {n:['','','',''], media:'', abono:false}; }
 function hmDiscVazia(){ const f=[]; for(let i=0;i<7;i++) f.push(formVazia()); return {form:f, mediaForm:'', prova:''}; }
 function moduloVazio(id, nome){
   const p=[]; for(let i=0;i<7;i++) p.push(probVazio());
@@ -2750,7 +2752,7 @@ function notasSeed(){
     .forEach((x,i)=>{ m2.problemas[i]=x; });
   const m3 = moduloVazio('m3','Geriatria');
   const hm1 = {ger:hmDiscVazia(), go:hmDiscVazia(), ped:hmDiscVazia()};
-  hm1.ger.form[0].media='0'; hm1.ger.form[1].media='5,34'; hm1.ger.form[2].n=['8','4,5','5,5'];
+  hm1.ger.form[0].media='0'; hm1.ger.form[1].media='5,34'; hm1.ger.form[2].n=['8','4,5','5,5',''];
   hm1.ger.form[3].media='3,87'; hm1.ger.form[4].abono=true;
   hm1.ger.mediaForm='4,24'; hm1.ger.prova='5';
   hm1.go.mediaForm='7,36'; hm1.go.prova='6,5';
@@ -2947,7 +2949,7 @@ function renderNotas(){
   /* HM */
   html += '<div class="card" style="margin-top:16px">' + cardHead('stethoscope','Habilidades Médicas · formativas','var(--s1)',
     '<div class="seg"><button class="'+(bim===0?'on-good':'')+'" onclick="setNotasBim(0)">1º bim</button><button class="'+(bim===1?'on-good':'')+'" onclick="setNotasBim(1)">2º bim</button></div>');
-  html += '<div class="hint">Cada formativa: as 3 notas viram a média do dia sozinhas. Se o professor deu só a média, digite em "média". Abono não entra na conta. Média final = (média das formativas + prova) ÷ 2.</div>';
+  html += '<div class="hint">Cada formativa: as 4 notas (N1 a N4) viram a média do dia sozinhas. Se o professor deu só a média, digite em "média". Abono não entra na conta. Média final = (média das formativas + prova) ÷ 2.</div>';
   html += '<div class="n-hm">' + hmDisc(bim).map(([k,nome])=>{
     const d = N.hm[bim][k], inf = hb.disc[k], base = 'hm.'+bim+'.'+k;
     let rows = d.form.map((f,fi)=>{
@@ -2958,7 +2960,7 @@ function renderNotas(){
         '<button class="n-abbtn'+(f.abono?' on':'')+'" onclick="ntoggle(\''+base+'.form.'+fi+'.abono\')" title="Abono">Ab</button></div>';
     }).join('');
     return '<div class="n-hmd"><div class="n-hmd-h"><b>'+nome+'</b><span class="n-big" style="color:'+notaCor(inf.final)+'">'+fmtN(inf.final)+'</span></div>' +
-      '<div class="n-fhead"><span>#</span><span>N1</span><span>N2</span><span>N3</span><span>média</span><span></span></div>' + rows +
+      '<div class="n-fhead"><span>#</span><span>N1</span><span>N2</span><span>N3</span><span>N4</span><span>média</span><span></span></div>' + rows +
       '<div class="n-sum"><label>Média das formativas '+nIn(base+'.mediaForm', d.mediaForm, inf.auto===null?'auto':fmtN(inf.auto))+'</label>' +
       '<label>Prova '+nIn(base+'.prova', d.prova, '—')+'</label></div>' +
       (inf.over!==null && inf.auto!==null && Math.abs(inf.over-inf.auto)>0.005 ? '<div class="hint" style="margin:6px 0 0">Calculada pelas formativas: '+fmtN(inf.auto)+' · está valendo a que você digitou ('+fmtN(inf.over)+'). Apague pra usar a calculada.</div>' : '') +
