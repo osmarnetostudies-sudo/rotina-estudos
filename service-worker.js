@@ -1,4 +1,4 @@
-const CACHE = 'plantao-v8';
+const CACHE = 'plantao-v9';
 const ASSETS = ['./rotina-estudos.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
