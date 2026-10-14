@@ -808,7 +808,7 @@ function loadState(){
   merged.blocoChecks = raw.blocoChecks || {};
   merged.historico = Array.isArray(raw.historico) ? raw.historico : [];
   merged.gradeExtras = Array.isArray(raw.gradeExtras) ? raw.gradeExtras : [];
-  merged.notas = (raw.notas && Array.isArray(raw.notas.modulos)) ? raw.notas : notasSeed();
+  merged.notas = notasFix((raw.notas && Array.isArray(raw.notas.modulos)) ? raw.notas : notasSeed());
   merged.sync = Object.assign({code:null}, raw.sync);
   return merged;
 }
@@ -2716,7 +2716,21 @@ function renderConfig(){
 
 const NOTA_MIN = 5.75;   // abaixo disso no módulo de tutoria + Morfo/PI precisa de aceleração
 const PESOS = {prob:0.5, prova:0.2, pratica:0.18, escrita:0.12, acel:0.3};
-const HM_DISC = [['ger','Geriatria'],['go','Ginecologia e Obstetrícia'],['ped','Pediatria']];
+function hmDiscBim(){ return [
+  [['ger','Geriatria'],['go','Ginecologia e Obstetrícia'],['ped','Pediatria']],
+  [['pneumo','Pneumologia'],['go','Ginecologia e Obstetrícia'],['ped','Pediatria']]
+]; }
+const HM_TODAS = [['ger','Geriatria'],['pneumo','Pneumologia'],['go','Ginecologia e Obstetrícia'],['ped','Pediatria']];
+function hmDisc(bi){ return hmDiscBim()[bi===1?1:0]; }
+/* garante que cada bimestre tem as disciplinas certas (2º bim: Pneumologia no lugar de Geriatria) */
+function notasFix(N){
+  if(!N || !Array.isArray(N.hm)) return N;
+  while(N.hm.length<2) N.hm.push({});
+  const b2 = N.hm[1];
+  if(!b2.pneumo){ b2.pneumo = b2.ger || hmDiscVazia(); delete b2.ger; }
+  N.hm.forEach((b,bi)=>{ hmDisc(bi).forEach(([k])=>{ if(!b[k]) b[k] = hmDiscVazia(); }); });
+  return N;
+}
 
 function probVazio(){ return {ab:['','',''], fe:['','',''], abA:false, abF:false}; }
 function formVazia(){ return {n:['','',''], media:'', abono:false}; }
@@ -2741,7 +2755,7 @@ function notasSeed(){
   hm1.ger.mediaForm='4,24'; hm1.ger.prova='5';
   hm1.go.mediaForm='7,36'; hm1.go.prova='6,5';
   hm1.ped.mediaForm='7,38'; hm1.ped.prova='7';
-  const hm2 = {ger:hmDiscVazia(), go:hmDiscVazia(), ped:hmDiscVazia()};
+  const hm2 = {pneumo:hmDiscVazia(), go:hmDiscVazia(), ped:hmDiscVazia()};
   return {versao:1, moduloAtual:'m2', modulos:[m1,m2,m3], hm:[hm1,hm2], piesf:['','']};
 }
 
@@ -2826,9 +2840,9 @@ function hmDiscInfo(d){
   const fin = media([mf, prova]);
   return {medias, auto, over, mf, prova, final: fin, nForm: medias.filter(x=>x!==null).length};
 }
-function hmBimInfo(b){
-  const disc = {}; HM_DISC.forEach(([k])=>{ disc[k] = hmDiscInfo(b[k]); });
-  return {disc, media: media(HM_DISC.map(([k])=>disc[k].final))};
+function hmBimInfo(b, bi){
+  const disc = {}; hmDisc(bi).forEach(([k])=>{ disc[k] = hmDiscInfo(b[k] || hmDiscVazia()); });
+  return {disc, media: media(hmDisc(bi).map(([k])=>disc[k].final))};
 }
 
 /* ---- edição ---- */
@@ -2878,11 +2892,11 @@ function notaBar(n, comMarca){
 
 /* ---- tela ---- */
 function renderNotas(){
-  const N = state.notas;
+  const N = notasFix(state.notas);
   const mods = N.modulos.map(m=>({m, i:modInfo(m)}));
   const atual = mods.find(x=>x.m.id===N.moduloAtual) || mods[0];
   const bim = state.ui.notasBim===1 ? 1 : 0;
-  const hmB = N.hm.map(hmBimInfo);
+  const hmB = N.hm.map((b,i)=>hmBimInfo(b,i));
   const piesf = N.piesf.map(nv);
 
   /* painel */
@@ -2911,7 +2925,7 @@ function renderNotas(){
   const hb = hmB[bim];
   html += '<div class="n-tile" style="--c:var(--s1)"><div class="n-t-lbl">'+ic('stethoscope')+'Habilidades Médicas · '+(bim+1)+'º bim</div>' +
     '<div class="n-t-num" style="color:'+notaCor(hb.media)+'">'+fmtN(hb.media)+'</div>' + notaBar(hb.media) +
-    '<div class="n-mini">'+HM_DISC.map(([k,nome])=>'<span>'+nome.split(' ')[0]+' <b style="color:'+notaCor(hb.disc[k].final)+'">'+fmtN(hb.disc[k].final)+'</b></span>').join('')+'</div></div>';
+    '<div class="n-mini">'+hmDisc(bim).map(([k,nome])=>'<span>'+nome.split(' ')[0]+' <b style="color:'+notaCor(hb.disc[k].final)+'">'+fmtN(hb.disc[k].final)+'</b></span>').join('')+'</div></div>';
   // tile PIESF
   const pm = media(piesf);
   html += '<div class="n-tile" style="--c:var(--s3)"><div class="n-t-lbl">'+ic('homeheart')+'PIESF</div>' +
@@ -2934,7 +2948,7 @@ function renderNotas(){
   html += '<div class="card" style="margin-top:16px">' + cardHead('stethoscope','Habilidades Médicas · formativas','var(--s1)',
     '<div class="seg"><button class="'+(bim===0?'on-good':'')+'" onclick="setNotasBim(0)">1º bim</button><button class="'+(bim===1?'on-good':'')+'" onclick="setNotasBim(1)">2º bim</button></div>');
   html += '<div class="hint">Cada formativa: as 3 notas viram a média do dia sozinhas. Se o professor deu só a média, digite em "média". Abono não entra na conta. Média final = (média das formativas + prova) ÷ 2.</div>';
-  html += '<div class="n-hm">' + HM_DISC.map(([k,nome])=>{
+  html += '<div class="n-hm">' + hmDisc(bim).map(([k,nome])=>{
     const d = N.hm[bim][k], inf = hb.disc[k], base = 'hm.'+bim+'.'+k;
     let rows = d.form.map((f,fi)=>{
       const mAuto = media(f.n.map(nv));
@@ -2950,8 +2964,8 @@ function renderNotas(){
       (inf.over!==null && inf.auto!==null && Math.abs(inf.over-inf.auto)>0.005 ? '<div class="hint" style="margin:6px 0 0">Calculada pelas formativas: '+fmtN(inf.auto)+' · está valendo a que você digitou ('+fmtN(inf.over)+'). Apague pra usar a calculada.</div>' : '') +
     '</div>';
   }).join('') + '</div>';
-  const sem = HM_DISC.map(([k,nome])=>{ const v = media(hmB.map(b=>b.disc[k].final)); return '<span>'+nome+': <b style="color:'+notaCor(v)+'">'+fmtN(v)+'</b></span>'; }).join('');
-  html += '<div class="n-mini" style="margin-top:12px">'+ic('calendar')+'<span><b>Semestre</b> (média dos 2 bimestres):</span>'+sem+'</div>';
+  const sem = HM_TODAS.map(([k,nome])=>{ const v = media(hmB.map(b=>b.disc[k] ? b.disc[k].final : null)); return '<span>'+nome+': <b style="color:'+notaCor(v)+'">'+fmtN(v)+'</b></span>'; }).join('');
+  html += '<div class="n-mini" style="margin-top:12px">'+ic('calendar')+'<span><b>Semestre</b> (média dos bimestres em que a disciplina teve nota):</span>'+sem+'</div>';
   html += '</div>';
   return html;
 }
