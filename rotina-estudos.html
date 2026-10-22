@@ -828,6 +828,41 @@ const FOCUS_TUT = {
     ]
   }
 };
+/* Planos especiais por data (sobrepõem o plano da semana só naquele dia). */
+const FOCUS_DATA = {
+  '2026-10-22': {
+    titulo: 'Plano especial · aula da Dora hoje + provona de Neuro amanhã',
+    dica: 'Intercalando: Dora e Neuro se revezam a cada ~45 min. Trocar de assunto cansa menos e fixa mais do que 3 h seguidas de uma coisa só. Nos blocos de Neuro, use a página “Provona de Neuro” e comece pelos temas 🔥.',
+    blocos: [
+      {time:'06:00–07:00', subject:'geral', note:'⏰ Acordar, café, banho rápido. Às 7h em ponto na mesa, celular longe.'},
+      {time:'07:00–07:50', subject:'hm', subtopic:'cardiopneumo', note:'Dora · passada na matéria de hoje (Tórax em Cadeia): ler entendendo o porquê e, no fim de cada parte, responder em voz alta as perguntas que ela faria.'},
+      {time:'07:50–08:40', subject:'tutoria', extra:'Provona de Neuro 🔥', note:'Neuro · vias piramidal e extrapiramidal, decussação (“sempre cai”) e neurônio motor superior × inferior. Ler na apostila e logo depois fazer as questões reais desses temas.'},
+      {time:'08:40–08:50', subject:'geral', note:'☕ Pausa de 10 min: levantar, água, sem celular.'},
+      {time:'08:50–09:35', subject:'hm', subtopic:'cardiopneumo', note:'Dora · simulado oral: sortear perguntas e responder em até 10 segundos, sem olhar. O que travar vira cartão.'},
+      {time:'09:35–10:25', subject:'tutoria', extra:'Provona de Neuro 🔥', note:'Neuro · Broca e Wernicke, circuito de Papez, ondas cerebrais (alfa, beta, teta, delta, gama) e TDAH (etapas do diagnóstico, como dar o diagnóstico, área e prejuízos).'},
+      {time:'10:25–10:35', subject:'geral', note:'☕ Pausa de 10 min.'},
+      {time:'10:35–11:15', subject:'hm', subtopic:'cardiopneumo', note:'Dora · última passada só nos cartões que travaram + o “rodapé” (valores, nomes, exceções), em voz alta.'},
+      {time:'11:15–12:00', subject:'tutoria', extra:'Provona de Neuro 🔥', note:'Neuro · olho, audição/equilíbrio e tato: ler os pontos 🔥 e fazer questões reais. Errou? Anote o tema para a noite.'},
+      {time:'12:00–12:45', subject:'geral', note:'🍽️ Almoço e banho. 13h Pediatria, depois aula da Dora.'},
+      {time:'19:00–20:00', subject:'tutoria', extra:'Provona de Neuro', note:'Neuro · simulado com as questões reais das provas antigas. Marcar cada erro e o tema dele.'},
+      {time:'20:10–21:00', subject:'tutoria', extra:'Provona de Neuro', note:'Neuro · voltar na apostila SÓ nos temas que errou e explicar em voz alta. Lesão pelos sinais clínicos: treinar “onde é a lesão?”.'},
+      {time:'21:00–21:40', subject:'tutoria', extra:'Provona de Neuro', note:'Neuro · passada leve nos 🔥 (sem conteúdo novo). Depois cama: dormir bem antes da prova vale mais que 1 h a mais de estudo.'}
+    ]
+  }
+};
+function focusForDate(dateKey){
+  if(FOCUS_DATA[dateKey]) return FOCUS_DATA[dateKey].blocos;
+  const d = new Date(dateKey+'T12:00:00');
+  const map = {0:'dom',1:'seg',2:'ter',3:'qua',4:'qui',5:'sex',6:'sab'};
+  return focusFor(map[d.getDay()]);
+}
+function dateOfWeekday(dk){
+  const idx = {seg:1,ter:2,qua:3,qui:4,sex:5,sab:6,dom:0}[dk];
+  const now = new Date(); now.setHours(12,0,0,0);
+  const cur = now.getDay()===0 ? 7 : now.getDay();
+  const tgt = idx===0 ? 7 : idx;
+  return localDateKey(new Date(now.getTime() + (tgt-cur)*86400000));
+}
 function tutoriaCiclo(){ return state.settings.tutoriaCiclo === 'B' ? 'B' : 'A'; }
 function setTutoriaCiclo(c){ state.settings.tutoriaCiclo = c; saveState(); render(); aviso(c==='B' ? 'Ciclo B: abertura na sexta, fechamento na terça' : 'Ciclo A: abertura na terça, fechamento na sexta'); }
 function focusFor(d){
@@ -2098,12 +2133,13 @@ function renderHoje(){
   const dataTxt = hoje.toLocaleDateString('pt-BR',{day:'numeric', month:'long'});
   let html = '<div class="greet"><div><h1>'+greeting()+', Osmar</h1><p>'+DAY_FULL[todayKeyAny()]+', '+dataTxt+'</p></div></div>';
 
-  const focusList = focusFor(todayKeyAny());
   const fk = todayFullKey();
+  const focusList = focusForDate(fk);
+  const especial = FOCUS_DATA[fk];
   const doneCount = focusList.filter((f,idx)=>state.blocoChecks[blocoCheckKey(fk, idx)]).length;
   const pct = focusList.length ? Math.round(doneCount/focusList.length*100) : 0;
 
-  let blocos = '<div class="card">' + cardHead('target','Blocos de estudo','var(--accent)') + cicloToggleHtml();
+  let blocos = '<div class="card">' + cardHead('target', especial ? especial.titulo : 'Blocos de estudo','var(--accent)') + (especial ? '<div class="hint" style="margin:0 0 10px">'+especial.dica+'</div>' : cicloToggleHtml());
   if(focusList.length){
     blocos += '<div class="prog"><div class="track"><div class="fill" style="width:'+pct+'%"></div></div><span class="n">'+doneCount+'/'+focusList.length+'</span></div>';
     blocos += focusList.map((f,idx)=>renderFocusItem(f, idx, fk)).join('');
@@ -2233,6 +2269,7 @@ function renderFocusItem(f, idx, checkDateKey){
   let extra = '';
   if(f.subtopic){ const x=HM_SUBTOPICS.find(h=>h.key===f.subtopic); if(x) extra=x.label; }
   if(f.mode){ const x=TUTORIA_MODES.find(h=>h.key===f.mode); if(x) extra=x.label; }
+  if(f.extra) extra = f.extra;
   const parts = String(f.time||'').split('–');
   const st = checkDateKey ? rangeState(parts[0], parts[1]) : '';
   const chipHtml = isGeral ? '<span class="chip" style="--c:var(--ink-3)">'+ic('layers')+'Organização</span>' : chip(f.subject);
@@ -2307,8 +2344,9 @@ function renderSemana(){
   const fk = todayKeyAny();
   html += '<div class="card">' + cardHead('target','Blocos de estudo por dia','var(--accent)') + cicloToggleHtml() + '<div class="hint" style="margin:0 0 10px">Plano espaçado: a Dora começa no sábado e volta todo dia um pouquinho; o fechamento é dividido em 3 dias e a véspera é só revisão. Estudar tudo de uma vez na véspera faz esquecer rápido.</div>';
   html += DAY_ORDER_ALL.map(d=>{
-    const inner = focusFor(d).map((f,idx)=>renderFocusItem(f, idx, null)).join('');
-    return '<h3>'+DAY_FULL[d]+(d===fk?' <span class="today-tag">· hoje</span>':'')+'</h3>' + inner;
+    const dk = dateOfWeekday(d);
+    const inner = focusForDate(dk).map((f,idx)=>renderFocusItem(f, idx, null)).join('');
+    return '<h3>'+DAY_FULL[d]+(d===fk?' <span class="today-tag">· hoje</span>':'')+(FOCUS_DATA[dk]?' <span class="today-tag">· plano especial</span>':'')+'</h3>' + inner;
   }).join('');
   html += '</div>';
   return html;
@@ -2542,9 +2580,7 @@ function blocosNaoFeitos(dayKey){
   const prefix = dayKey+'|';
   const marcou = Object.keys(state.blocoChecks).some(k=>k.startsWith(prefix) && state.blocoChecks[k]);
   if(!marcou) return null;
-  const d = new Date(dayKey+'T12:00:00');
-  const map = {0:'dom',1:'seg',2:'ter',3:'qua',4:'qui',5:'sex',6:'sab'};
-  const lista = focusFor(map[d.getDay()]);
+  const lista = focusForDate(dayKey);
   const falt = lista.filter((f,idx)=>!state.blocoChecks[blocoCheckKey(dayKey, idx)]);
   return falt.length ? {falt, total:lista.length} : null;
 }
