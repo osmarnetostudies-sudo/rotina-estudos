@@ -3186,7 +3186,26 @@ function renderModuloNotas(m, I, mi){
 
 /* ---------- diário do dia a dia (hábitos + sono) ---------- */
 
-function normalizarExtras(){ state.notas = notasFix(state.notas && Array.isArray(state.notas.modulos) ? state.notas : notasSeed()); state.diario = diarioFix(state.diario); }
+function normalizarExtras(){ state.notas = notasFix(state.notas && Array.isArray(state.notas.modulos) ? state.notas : notasSeed()); state.diario = diarioFix(state.diario);  if(injetarPrazos()) setTimeout(()=>{ saveState(); render(); },0); }
+/* prazos cadastrados pelo Claude: entram uma vez só (se apagar, não voltam) */
+const PRAZOS_CLAUDE = [
+  {id:'claude-hm-colo-20261109', text:'Entregar exercício de Rastreamento de Ca de Colo Uterino (HM III · Prof. Selvio) no Blackboard', subject:'hm', dueDate:'2026-11-09', dueTime:'22:00',
+   notes:'Exercício obrigatório sobre as Diretrizes de Rastreamento de Câncer de Colo Uterino. Entrega SÓ pelo Blackboard até 22h de segunda (09/11). Fora do prazo = nota ZERO. Usa ferramenta anti-plágio. Instruções e link na pasta de conteúdo do curso.'}
+];
+function injetarPrazos(){
+  if(!state || !Array.isArray(state.tasks)) return false;
+  if(!state.settings) state.settings = {};
+  const feitos = Array.isArray(state.settings.prazosClaude) ? state.settings.prazosClaude : [];
+  let changed = false;
+  PRAZOS_CLAUDE.forEach(p=>{
+    if(feitos.includes(p.id)) return;
+    const existe = state.tasks.some(t=>t.id===p.id) || (state.historico||[]).some(h=>h.taskId===p.id);
+    if(!existe) state.tasks.unshift({id:p.id, text:p.text, subject:p.subject, dueDate:p.dueDate, dueTime:p.dueTime, done:false, failed:false, failedAt:null, notes:p.notes, recurWeekday:null, createdAt:Date.now()});
+    feitos.push(p.id); changed = true;
+  });
+  state.settings.prazosClaude = feitos;
+  return changed;
+}
 function diarioSeed(){
   return {
     metas:{dormir:'22:00', acordar:'05:00', tolerancia:15, horasSono:7},
@@ -3435,6 +3454,7 @@ function init(){
   setInterval(updateLiveClock, 1000);
   setInterval(updateTaskCountdowns, 30000);
   setInterval(()=>{ cycleRecurringTasks(); checkTaskDeadlines(); }, 60000);
+  if(injetarPrazos()) saveState();
   cycleRecurringTasks();
   checkTaskDeadlines();
 
