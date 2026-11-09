@@ -596,6 +596,21 @@ textarea.importar{min-height:90px;font:12.5px var(--mono);}
 .n-good{background:color-mix(in srgb,var(--good) 12%,transparent);}
 .n-good .ic{color:var(--good);margin-top:2px;}
 .n-info{background:var(--surface-2);}
+.n-sec{border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px;}
+.n-sec-h{display:flex;align-items:baseline;gap:8px;margin-bottom:2px;font-size:14px;}
+.n-sec-h small{color:var(--ink-3);font-size:12px;}
+.n-sec .n-crow,.n-c2 .n-crow{grid-template-columns:minmax(0,1fr) auto;}
+.n-crow.sub .n-cn{flex-direction:row;align-items:center;flex-wrap:wrap;gap:4px;}
+.n-crow.sub{border-top:1px dashed var(--line-2);margin-top:2px;}
+.n-crow.sub .n-cn{font-weight:700;color:var(--ink);}
+.n-zero{font:600 12px var(--mono);color:var(--ink-3);}
+.n-st{display:inline-block;font:700 10px var(--mono);letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:5px;margin-left:4px;vertical-align:middle;}
+.n-st.ok{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good);}
+.n-st.fac{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn);}
+.n-st.obr{background:color-mix(in srgb,var(--crit) 15%,transparent);color:var(--crit);}
+.n-t-num.sm{font-size:24px;}
+.n-t-row{gap:20px;}
+.n-mod-v small{font-size:10px;color:var(--ink-3);font-weight:500;}
 .n-oficial{padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:color-mix(in srgb,var(--accent) 6%,var(--surface));margin-bottom:14px;}
 .n-of-h{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:14.5px;}
 .n-of-h .ic{color:var(--accent);}
@@ -3015,56 +3030,78 @@ function fmtN(n, casas){
 }
 function media(arr){ const v = arr.filter(x=>x!==null); return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null; }
 
-/* Problema: (soma das 3 notas da abertura + soma das 3 do fechamento) / 6.
-   Parte com abono sai da conta (divide por 3). Parte ainda sem nota nenhuma fica "pendente"
-   e não entra (na planilha ela contava como zero até você lançar). */
+/* Conta igual à planilha da faculdade: o que está EM BRANCO vale ZERO.
+   Problema: (3 notas da abertura + 3 do fechamento) / 6. Parte com abono sai da conta.
+   Problema sem nenhuma nota lançada ainda não aconteceu, então não entra na média. */
+const ACEL_FAC = 6;   // abaixo de 6 na média tutoria ou na média MF+PI: aceleração facultativa
+const ACEL_OBR = 4;   // abaixo de 4: aceleração obrigatória
 function probInfo(p){
   const parte = (notas, abono)=>{
     if(abono) return {st:'abono'};
     const v = notas.map(nv);
-    if(v.every(x=>x===null)) return {st:'pend'};
-    return {st:'ok', soma:v.reduce((a,b)=>a+(b||0),0)};
+    const brancos = v.filter(x=>x===null).length;
+    return {st: brancos===3 ? 'pend' : (brancos ? 'incompleta' : 'ok'), soma:v.reduce((a,b)=>a+(b||0),0), brancos};
   };
   const a = parte(p.ab, p.abA), f = parte(p.fe, p.abF);
-  const ok = [a,f].filter(x=>x.st==='ok');
-  if(!ok.length) return {media:null, st:(a.st==='pend'&&f.st==='pend')?'vazio':'pend', a, f};
-  const m = ok.reduce((s,x)=>s+x.soma,0)/(ok.length*3);
-  const pend = a.st==='pend' || f.st==='pend';
-  return {media:m, st: pend?'parcial':'completo', a, f};
+  const temNota = [a,f].some(x=>x.st==='ok' || x.st==='incompleta');
+  if(!temNota) return {media:null, st:'vazio', a, f};
+  const conta = [a,f].filter(x=>x.st!=='abono');
+  if(!conta.length) return {media:null, st:'vazio', a, f};
+  const m = conta.reduce((s,x)=>s+x.soma,0)/(conta.length*3);
+  const brancos = conta.reduce((s,x)=>s+x.brancos,0);
+  return {media:m, st: brancos ? 'parcial' : 'completo', brancos, a, f};
 }
-
+function arred05(n){ return n===null ? null : Math.round(n*2)/2; }
+function statusAcel(n){
+  if(n===null) return null;
+  if(n < ACEL_OBR) return {k:'obr', txt:'aceleração obrigatória'};
+  if(n < ACEL_FAC) return {k:'fac', txt:'aceleração facultativa'};
+  return {k:'ok', txt:'sem aceleração'};
+}
 function modInfo(m){
   const probs = m.problemas.map(probInfo);
   const comMedia = probs.filter(x=>x.media!==null);
-  const probAvg = media(comMedia.map(x=>x.media));
+  const probAvg = comMedia.length ? media(comMedia.map(x=>x.media)) : null;
   const parciais = probs.filter(x=>x.st==='parcial').length;
-  const prova = nv(m.provaTutoria);
-  const escrita = nv(m.escrita);
-  const labs = m.labs.map(nv);
-  const mediaMFPI = nv(m.mediaMFPI);
-  let pratica = null, praticaDe = '';
-  if(labs.some(x=>x!==null)){ pratica = labs.reduce((a,b)=>a+(b||0),0); praticaDe='provinhas'; }
-  else if(mediaMFPI!==null && escrita!==null){ pratica = (mediaMFPI*(PESOS.pratica+PESOS.escrita) - escrita*PESOS.escrita)/PESOS.pratica; praticaDe='média informada'; }
-  const comp = [
-    {k:'prob', nome:'Média dos problemas', nota:probAvg, peso:PESOS.prob},
-    {k:'prova', nome:'Prova de tutoria', nota:prova, peso:PESOS.prova},
-    {k:'pratica', nome:'Prova prática · MF e PI', nota:pratica, peso:PESOS.pratica},
-    {k:'escrita', nome:'Prova escrita · MF e PI', nota:escrita, peso:PESOS.escrita}
-  ];
-  comp.forEach(c=>{ c.pts = c.nota===null ? null : c.nota*c.peso; });
-  const pts = comp.reduce((s,c)=>s+(c.pts||0),0);
-  const faltando = comp.filter(c=>c.nota===null);
-  const completo = !faltando.length;
-  let precisa = null;   // quanto precisa tirar no que falta (quando só falta 1 coisa)
-  if(faltando.length===1){ const c = faltando[0]; precisa = {comp:c, nota:(NOTA_MIN - pts)/c.peso}; }
+  let provaRaw = nv(m.provaTutoria), provaDe = '';
+  const escritaRaw = nv(m.escrita);
+  /* módulo com resultado oficial e prova em branco: a prova sai da média tutoria oficial */
+  if(provaRaw===null && m.oficial && nv(m.oficial.tutoria)!==null && probAvg!==null){
+    const pTut = PESOS.prob + PESOS.prova;
+    provaRaw = Math.max(0, Math.min(10, (nv(m.oficial.tutoria)*pTut - (nv(m.oficial.probs)!==null ? nv(m.oficial.probs) : probAvg)*PESOS.prob)/PESOS.prova));
+    provaDe = 'oficial';
+  }
+  const labs = m.labs.map(nv), mediaInf = nv(m.mediaMFPI);
+  const prova = provaRaw===null ? 0 : provaRaw;
+  const escrita = escritaRaw===null ? 0 : escritaRaw;
+  let praticaRaw = null, praticaDe = '';
+  if(labs.some(x=>x!==null)){ praticaRaw = labs.reduce((a,b)=>a+(b||0),0); praticaDe='provinhas'; }
+  else if(mediaInf!==null && escritaRaw!==null){ praticaRaw = (mediaInf*(PESOS.pratica+PESOS.escrita) - escritaRaw*PESOS.escrita)/PESOS.pratica; praticaDe='média informada'; }
+  const pratica = praticaRaw===null ? 0 : praticaRaw;
+  const pT = PESOS.prob + PESOS.prova, pM = PESOS.pratica + PESOS.escrita;   // 0,7 e 0,3
+  const tutoria = probAvg===null ? null : (probAvg*PESOS.prob + prova*PESOS.prova)/pT;
+  const mfpiCalc = (pratica*PESOS.pratica + escrita*PESOS.escrita)/pM;
+  const mfpi = mediaInf!==null ? mediaInf : mfpiCalc;
   const acel = nv(m.aceleracao);
-  const finalAcel = (acel!==null && probAvg!==null && prova!==null) ? probAvg*PESOS.prob + prova*PESOS.prova + acel*PESOS.acel : null;
-  const precisaAcel = (completo && pts<NOTA_MIN && probAvg!==null && prova!==null) ? (NOTA_MIN - probAvg*PESOS.prob - prova*PESOS.prova)/PESOS.acel : null;
-  const mfpiMedia = (pratica!==null && escrita!==null) ? (pratica*PESOS.pratica + escrita*PESOS.escrita)/(PESOS.pratica+PESOS.escrita) : mediaMFPI;
-  let finalOficial = completo ? pts : null;
-  if(completo && pts<NOTA_MIN && finalAcel!==null) finalOficial = finalAcel;
-  return {probs, probAvg, parciais, comp, pts, faltando, completo, precisa, acel, finalAcel, precisaAcel, pratica, praticaDe, mfpiMedia, finalOficial,
-          nProbs: comMedia.length};
+  const mfpiValendo = acel!==null ? acel : mfpi;
+  const modulo = tutoria===null ? null : tutoria*pT + mfpiValendo*pM;
+  const faltando = [];
+  if(provaRaw===null) faltando.push('prova de tutoria');
+  if(mediaInf===null){ if(praticaRaw===null) faltando.push('prova prática'); if(escritaRaw===null) faltando.push('prova escrita'); }
+  /* quanto precisa no que falta pra sair de aceleração (6) */
+  const precisa = [];
+  if(provaRaw===null && probAvg!==null) precisa.push({nome:'prova de tutoria', nota:(ACEL_FAC*pT - probAvg*PESOS.prob)/PESOS.prova, alvo:'média tutoria'});
+  if(mediaInf===null && acel===null){
+    if(praticaRaw===null && escritaRaw!==null) precisa.push({nome:'prova prática', nota:(ACEL_FAC*pM - escrita*PESOS.escrita)/PESOS.pratica, alvo:'média MF + PI'});
+    else if(escritaRaw===null && praticaRaw!==null) precisa.push({nome:'prova escrita', nota:(ACEL_FAC*pM - pratica*PESOS.pratica)/PESOS.escrita, alvo:'média MF + PI'});
+    else if(escritaRaw===null && praticaRaw===null) precisa.push({nome:'prova prática e na escrita', nota:ACEL_FAC, alvo:'média MF + PI'});
+  }
+  const ofi = m.oficial ? nv(m.oficial.publicada) : null;
+  const publicada = arred05(modulo);
+  return {probs, probAvg, parciais, prova, provaRaw, provaDe, pratica, praticaRaw, praticaDe, escrita, escritaRaw, mediaInf,
+          tutoria, mfpi, mfpiValendo, acel, modulo, publicada, faltando, completo: !faltando.length && !parciais,
+          precisa, stTut: statusAcel(tutoria), stMf: statusAcel(acel!==null ? acel : mfpi),
+          finalOficial: ofi!==null ? ofi : publicada, nProbs: comMedia.length};
 }
 
 function hmFormMedia(f){
@@ -3143,25 +3180,20 @@ function renderNotas(){
 
   /* painel */
   const ai = atual.i;
-  const valorPainel = ai.completo ? ai.finalOficial : ai.pts;
   let html = '<div class="card n-painel">' + cardHead('grad','Painel de notas','var(--accent)', '<span class="badge soft">2º ano</span>');
   html += '<div class="n-tiles">';
-  // tile tutoria
-  let sub;
-  if(ai.completo){
-    sub = ai.pts>=NOTA_MIN ? '<span class="n-ok">'+ic('check')+'Passou direto (mín. '+fmtN(NOTA_MIN)+')</span>'
-      : (ai.finalAcel!==null ? '<span class="'+(ai.finalAcel>=NOTA_MIN?'n-ok':'n-bad')+'">'+ic(ai.finalAcel>=NOTA_MIN?'check':'alert')+'Com aceleração: '+fmtN(ai.finalAcel)+'</span>'
-        : '<span class="n-bad">'+ic('alert')+'Abaixo de '+fmtN(NOTA_MIN)+' · precisa de '+fmtN(ai.precisaAcel)+' na aceleração</span>');
-  } else {
-    sub = '<span class="muted">'+fmtN(ai.pts)+' pontos já garantidos · faltam '+ai.faltando.map(c=>c.nome.split(' · ')[0].toLowerCase()).join(', ')+'</span>';
-  }
+  const pubTile = atual.m.oficial ? nv(atual.m.oficial.publicada) : ai.publicada;
+  const stChip = (st)=> st ? '<span class="n-st '+st.k+'">'+({ok:'ok',fac:'acel. facultativa',obr:'acel. obrigatória'})[st.k]+'</span>' : '';
   html += '<div class="n-tile big" style="--c:var(--s2)">' +
     '<div class="n-t-lbl">'+ic('users')+'Tutoria + Morfo/PI · '+escapeHtml(atual.m.nome)+'</div>' +
-    '<div class="n-t-row"><div><div class="n-t-num" style="color:'+notaCor(ai.probAvg)+'">'+fmtN(ai.probAvg)+'</div><div class="n-t-cap">média dos problemas</div></div>' +
-    '<div><div class="n-t-num" style="color:'+(ai.completo?notaCor(ai.finalOficial):'var(--ink-2)')+'">'+fmtN(valorPainel)+'</div><div class="n-t-cap">'+(ai.completo?'média final':'pontos até agora')+'</div></div></div>' +
-    notaBar(valorPainel, true) +
-    '<div class="n-t-sub">'+sub+'</div>' +
-    (ai.precisa && ai.precisa.comp.k!=='prob' ? '<div class="n-t-sub">'+ic('target')+'Pra fechar '+fmtN(NOTA_MIN)+', precisa de <b>'+(ai.precisa.nota<=0?'qualquer nota':(ai.precisa.nota>10?'mais que 10 (vai pra aceleração)':fmtN(ai.precisa.nota)))+'</b> na '+ai.precisa.comp.nome.toLowerCase()+'</div>' : '') +
+    '<div class="n-t-row">' +
+      '<div><div class="n-t-num" style="color:'+notaCor(pubTile)+'">'+fmtN(pubTile)+'</div><div class="n-t-cap">'+(atual.m.oficial?'média publicada (oficial)':'média do módulo agora')+'</div></div>' +
+      '<div><div class="n-t-num sm" style="color:'+notaCor(ai.tutoria)+'">'+fmtN(ai.tutoria)+'</div><div class="n-t-cap">tutoria '+stChip(ai.stTut)+'</div></div>' +
+      '<div><div class="n-t-num sm" style="color:'+notaCor(ai.mfpiValendo)+'">'+fmtN(ai.mfpiValendo)+'</div><div class="n-t-cap">MF + PI '+stChip(ai.stMf)+'</div></div>' +
+    '</div>' +
+    notaBar(pubTile, true) +
+    (atual.m.oficial ? '' : (ai.faltando.length ? '<div class="n-t-sub muted">'+ic('clock')+'O que está em branco conta zero. Falta lançar: '+ai.faltando.join(', ')+'. Cada nota que entrar sobe a média.</div>'
+      : '<div class="n-t-sub muted">'+ic('check')+'Tudo lançado.</div>')) +
   '</div>';
   // tile HM
   const hb = hmB[bim];
@@ -3176,10 +3208,10 @@ function renderNotas(){
   html += '</div>';
   // módulos do semestre
   html += '<h3>Módulos de tutoria + Morfo/PI</h3><div class="n-mods">' + mods.map(x=>{
-    const v = x.i.completo ? x.i.finalOficial : (x.m.oficial ? nv(x.m.oficial.publicada) : null);
+    const v = x.m.oficial ? nv(x.m.oficial.publicada) : (x.i.nProbs ? x.i.publicada : null);
     const on = x.m.id===atual.m.id;
     return '<button class="n-mod'+(on?' on':'')+'" onclick="setModuloAtual(\''+x.m.id+'\')"><span class="n-mod-n">'+escapeHtml(x.m.nome)+'</span>' +
-      '<span class="n-mod-v" style="color:'+notaCor(v!==null?v:x.i.probAvg)+'">'+(v!==null?fmtN(v):(x.i.nProbs?'em curso':'—'))+'</span></button>';
+      '<span class="n-mod-v" style="color:'+notaCor(v!==null?v:x.i.probAvg)+'">'+(v!==null?fmtN(v)+((x.m.oficial||x.i.completo)?'':' <small>parcial</small>'):'—')+'</span></button>';
   }).join('') + '</div>';
   html += '</div>';
 
@@ -3217,7 +3249,7 @@ function renderModuloNotas(m, I, mi){
   let html = '<div class="grid2 n-modgrid" style="margin-top:16px">';
   // problemas
   html += '<div class="card">' + cardHead('users','Problemas · '+escapeHtml(m.nome),'var(--s2)', '<span class="badge soft">média '+fmtN(I.probAvg)+'</span>');
-  html += '<div class="hint">3 notas na abertura e 3 no fechamento. Média do problema = soma das 6 ÷ 6. "Ab" = abono (aquela parte sai da conta). Falta sem abono = lance 0.</div>';
+  html += '<div class="hint">3 notas na abertura e 3 no fechamento. Média do problema = soma das 6 ÷ 6. Nota em branco conta zero (o problema só entra na média quando tiver a primeira nota). "Ab" = abono (aquela parte sai da conta).</div>';
   html += '<div class="n-probs">' + m.problemas.map((p,pi)=>{
     const inf = I.probs[pi], pb = base+'.problemas.'+pi;
     const linha = (lbl, key, abKey)=>{
@@ -3226,33 +3258,43 @@ function renderModuloNotas(m, I, mi){
         (ab ? '<span class="n-abtxt">Abono</span>' : p[key].map((v,j)=>nIn(pb+'.'+key+'.'+j, v, '')).join('')) +
         '<button class="n-abbtn'+(ab?' on':'')+'" onclick="ntoggle(\''+pb+'.'+abKey+'\')" title="Abono">Ab</button></div>';
     };
-    const tag = inf.st==='parcial' ? '<span class="badge warn">falta '+(inf.a.st==='pend'?'abertura':'fechamento')+'</span>' : '';
+    const tag = inf.st==='parcial' ? '<span class="badge warn">'+(inf.a.st==='pend'?'abertura em branco = 0':(inf.f.st==='pend'?'fechamento em branco = 0':'nota em branco = 0'))+'</span>' : '';
     return '<div class="n-prob'+(inf.st==='vazio'?' vazio':'')+'"><div class="n-prob-h"><b>Problema '+(pi+1)+'</b>'+tag+'<span class="spacer"></span><span class="n-big sm" style="color:'+notaCor(inf.media)+'">'+fmtN(inf.media)+'</span></div>' +
       linha('Abertura','ab','abA') + linha('Fechamento','fe','abF') + '</div>';
   }).join('') + '</div>';
-  if(I.parciais) html += '<div class="hint" style="margin:10px 0 0">'+ic('alert')+' '+I.parciais+' problema'+(I.parciais>1?'s':'')+' com parte pendente: a média dele usa só o que já tem nota. Quando sair a nota (ou o zero, se faltou), lance aqui.</div>';
+  if(I.parciais) html += '<div class="hint" style="margin:10px 0 0">'+ic('alert')+' '+I.parciais+' problema'+(I.parciais>1?'s':'')+' com nota em branco: o branco já está contando como zero (igual na planilha da faculdade). Quando sair a nota, lance aqui que a média sobe.</div>';
   html += '</div>';
 
-  // composição
+  // composição (igual à planilha oficial)
   html += '<div class="card">' + cardHead('target','Média final do módulo','var(--accent)');
   html += renderOficial(m);
-  html += '<div class="n-comp">' + I.comp.map(c=>{
-    return '<div class="n-crow"><span class="n-cn">'+c.nome+'<small>peso '+Math.round(c.peso*100)+'%</small></span>' +
-      '<span class="n-cv" style="color:'+notaCor(c.nota)+'">'+fmtN(c.nota)+'</span><span class="n-cp">'+(c.pts===null?'—':'+'+fmtN(c.pts))+'</span></div>';
-  }).join('') +
-  '<div class="n-crow tot"><span class="n-cn">'+(I.completo?'Média final':'Pontos até agora')+'</span><span></span><span class="n-cp" style="color:'+(I.completo?notaCor(I.pts):'var(--ink)')+'">'+fmtN(I.pts)+'</span></div></div>';
-  html += notaBar(I.pts, true);
-  if(I.completo && I.pts<NOTA_MIN) html += '<div class="n-alert">'+ic('alert')+'Abaixo de '+fmtN(NOTA_MIN)+': precisa de aceleração de Morfo + PI. Pra passar, a aceleração precisa ser pelo menos <b>'+fmtN(Math.max(0,I.precisaAcel))+'</b>.</div>';
-  else if(I.completo) html += '<div class="n-good">'+ic('check')+'Passou direto (mínimo '+fmtN(NOTA_MIN)+').</div>';
-  else if(I.precisa && I.precisa.comp.k!=='prob') html += '<div class="n-info">'+ic('target')+'Pra chegar em '+fmtN(NOTA_MIN)+', precisa de <b>'+(I.precisa.nota<=0?'qualquer nota':(I.precisa.nota>10?'mais que 10':fmtN(I.precisa.nota)))+'</b> na '+I.precisa.comp.nome.toLowerCase()+'.</div>';
+  const v0 = (raw, val)=> raw===null ? '<span class="n-zero" title="Em branco: conta zero">0 · em branco</span>' : fmtN(val);
+  const st = (s)=> s ? '<span class="n-st '+s.k+'">'+s.txt+'</span>' : '';
+  html += '<div class="n-sec"><div class="n-sec-h"><b>Tutoria</b><small>70% do módulo</small></div>' +
+    '<div class="n-crow"><span class="n-cn">Média dos problemas<small>50%</small></span><span class="n-cv" style="color:'+notaCor(I.probAvg)+'">'+fmtN(I.probAvg)+'</span></div>' +
+    '<div class="n-crow"><span class="n-cn">Prova de tutoria<small>'+(I.provaDe==='oficial'?'20% · tirada da média oficial':'20%')+'</small></span><span class="n-cv" style="color:'+notaCor(I.provaRaw)+'">'+v0(I.provaRaw, I.prova)+'</span></div>' +
+    '<div class="n-crow sub"><span class="n-cn">Média tutoria '+st(I.stTut)+'</span><span class="n-cv" style="color:'+notaCor(I.tutoria)+'">'+fmtN(I.tutoria)+'</span></div></div>';
+  html += '<div class="n-sec"><div class="n-sec-h"><b>Morfo + PI</b><small>30% do módulo</small></div>' +
+    (I.mediaInf!==null ? '<div class="n-crow"><span class="n-cn">Média MF + PI informada</span><span class="n-cv" style="color:'+notaCor(I.mediaInf)+'">'+fmtN(I.mediaInf)+'</span></div>' :
+      '<div class="n-crow"><span class="n-cn">Prova prática<small>18%</small></span><span class="n-cv" style="color:'+notaCor(I.praticaRaw)+'">'+v0(I.praticaRaw, I.pratica)+'</span></div>' +
+      '<div class="n-crow"><span class="n-cn">Prova escrita<small>12%</small></span><span class="n-cv" style="color:'+notaCor(I.escritaRaw)+'">'+v0(I.escritaRaw, I.escrita)+'</span></div>') +
+    (I.acel!==null ? '<div class="n-crow"><span class="n-cn">Aceleração MF + PI<small>substitui a média</small></span><span class="n-cv" style="color:'+notaCor(I.acel)+'">'+fmtN(I.acel)+'</span></div>' : '') +
+    '<div class="n-crow sub"><span class="n-cn">Média MF + PI '+st(I.stMf)+'</span><span class="n-cv" style="color:'+notaCor(I.mfpiValendo)+'">'+fmtN(I.mfpiValendo)+'</span></div></div>';
+  html += '<div class="n-comp n-c2"><div class="n-crow tot"><span class="n-cn">Média do módulo<small>tutoria × 70% + MF/PI × 30%</small></span><span class="n-cp" style="color:'+notaCor(I.modulo)+'">'+fmtN(I.modulo)+'</span></div>' +
+    '<div class="n-crow"><span class="n-cn">Como sai publicada<small>arredonda de 0,5 em 0,5</small></span><span class="n-cv" style="color:'+notaCor(I.publicada)+'">'+fmtN(I.publicada)+'</span></div></div>';
+  html += notaBar(I.modulo, true);
+  if(I.faltando.length || I.parciais) html += '<div class="n-info">'+ic('clock')+'<span>Tudo o que está em branco já está contando como <b>zero</b>, igual na planilha da faculdade. Conforme você lança as notas, a média vai subindo.'+(I.faltando.length?' Falta: '+I.faltando.join(', ')+'.':'')+'</span></div>';
+  I.precisa.forEach(x=>{
+    const n = x.nota;
+    html += '<div class="n-info">'+ic('target')+'<span>Pra '+x.alvo+' chegar em 6 (sem aceleração), precisa de <b>'+(n<=0?'qualquer nota':(n>10?'mais que 10':fmtN(n)))+'</b> na '+x.nome+'.</span></div>';
+  });
 
   html += '<h3>Lançar</h3>';
   html += '<label class="field"><span>Prova de tutoria</span>'+nIn(base+'.provaTutoria', m.provaTutoria, '—')+'</label>';
   html += '<label class="field"><span>Prova escrita · MF e PI</span>'+nIn(base+'.escrita', m.escrita, '—')+'</label>';
   html += '<div class="field n-labs"><span>Provinhas de laboratório<small>somadas viram a prova prática</small></span><span class="row">'+m.labs.map((v,j)=>nIn(base+'.labs.'+j, v, 'L'+(j+1))).join('')+'</span></div>';
-  html += '<label class="field"><span>Média final MF e PI informada<small>se não houver provinhas, a prática sai daqui</small></span>'+nIn(base+'.mediaMFPI', m.mediaMFPI, '—')+'</label>';
-  html += '<label class="field"><span>Aceleração Morfo + PI<small>substitui os 30% de MF/PI</small></span>'+nIn(base+'.aceleracao', m.aceleracao, '—')+'</label>';
-  if(I.finalAcel!==null) html += '<div class="n-info">'+ic('sparkle')+'Com aceleração: '+fmtN(I.probAvg)+'×50% + '+fmtN(nv(m.provaTutoria))+'×20% + '+fmtN(I.acel)+'×30% = <b>'+fmtN(I.finalAcel)+'</b></div>';
+  html += '<label class="field"><span>Média MF + PI oficial<small>se você já tiver a média publicada, coloque aqui que ela vale no lugar da conta</small></span>'+nIn(base+'.mediaMFPI', m.mediaMFPI, '—')+'</label>';
+  html += '<label class="field"><span>Aceleração Morfo + PI<small>a nota dela substitui a média de MF + PI</small></span>'+nIn(base+'.aceleracao', m.aceleracao, '—')+'</label>';
   if(I.praticaDe==='média informada') html += '<div class="hint" style="margin:8px 0 0">Prova prática calculada a partir da média informada: '+fmtN(I.pratica)+'.</div>';
   html += '</div></div>';
   return html;
@@ -3296,7 +3338,7 @@ function renderOficial(m){
     '<div class="n-of-h">'+ic('check')+'<b>Resultado oficial</b><span class="spacer"></span><span class="n-of-pub" style="color:'+notaCor(nv(o.publicada))+'">'+escapeHtml(o.publicada)+'</span></div>' +
     '<div class="n-comp">' + lin('Média dos problemas', o.probs) + lin('Média tutoria', o.tutoria, '70% do módulo') + lin('Média MF + PI', o.mfpi, '30% do módulo') + '</div>' +
     (o.resultado ? '<div class="n-alert" style="margin-top:8px">'+ic('alert')+'<span>'+escapeHtml(o.resultado)+'</span></div>' : '<div class="n-good" style="margin-top:8px">'+ic('check')+'Aprovado no módulo</div>') +
-    '<div class="hint" style="margin:8px 0 0">Fonte: '+escapeHtml(o.fonte)+'. A média publicada sai arredondada pra baixo de 0,5 em 0,5. Na planilha oficial, problema sem nota lançada conta como zero, por isso a média dos problemas pode ficar abaixo da calculada aqui embaixo.</div>' +
+    '<div class="hint" style="margin:8px 0 0">Fonte: '+escapeHtml(o.fonte)+'. A média publicada é a média do módulo arredondada de 0,5 em 0,5.</div>' +
   '</div>';
 }
 /* prazos cadastrados pelo Claude: entram uma vez só (se apagar, não voltam) */
