@@ -283,6 +283,16 @@ nav.bottom{display:none;}
 .blk .b-note{font-size:13.5px;color:var(--ink-2);line-height:1.45;}
 .blk.done .b-note,.blk.done .b-extra{text-decoration:line-through;color:var(--ink-3);}
 .blk.done .chip{opacity:.55;}
+.blk.meu{border-style:dashed;}
+.blk .b-del{margin-left:auto;width:26px;height:26px;}
+.meu-tag{font:700 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);padding:2px 6px;border-radius:5px;}
+.bx-add{margin-top:12px;width:100%;border-style:dashed;color:var(--ink-2);}
+.bx-form{margin-top:12px;display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--accent) 7%,var(--surface-2));border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--line));}
+.bx-form .bx-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;}
+.bx-form .form-row > select{flex:1 1 160px;}
+.bx-form .form-row > input[type=time]{flex:0 1 110px;}
+.bx-form .bx-ate{flex:0 0 auto;align-self:center;color:var(--ink-3);font-size:13px;}
+.bx-form textarea{width:100%;}
 
 /* checkbox redondo */
 .ck{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;margin:0;border-radius:7px;border:2px solid var(--line-2);background:var(--surface);display:grid;place-items:center;cursor:pointer;transition:background .15s,border-color .15s;}
@@ -939,6 +949,7 @@ function defaultState(){
     historico: [],
     sync: {code:null},
     gradeExtras: [],
+    blocosExtras: [],
     notas: notasSeed(),
     diario: diarioSeed(),
     localAt: 0,
@@ -971,6 +982,7 @@ function loadState(){
   merged.blocoChecks = raw.blocoChecks || {};
   merged.historico = Array.isArray(raw.historico) ? raw.historico : [];
   merged.gradeExtras = Array.isArray(raw.gradeExtras) ? raw.gradeExtras : [];
+  merged.blocosExtras = Array.isArray(raw.blocosExtras) ? raw.blocosExtras : [];
   merged.notas = notasFix((raw.notas && Array.isArray(raw.notas.modulos)) ? raw.notas : notasSeed());
   merged.diario = diarioFix(raw.diario);
   merged.sync = Object.assign({code:null}, raw.sync);
@@ -987,7 +999,7 @@ function uid(){ return Date.now().toString(36) + Math.random().toString(36).slic
 
 /* ---------- sincronização entre aparelhos (Firebase, pelo código) ---------- */
 
-const SYNC_FIELDS = ['subjects','settings','sessions','dailyReviews','tasks','blocoChecks','historico','gradeExtras','notas','diario'];
+const SYNC_FIELDS = ['subjects','settings','sessions','dailyReviews','tasks','blocoChecks','historico','gradeExtras','blocosExtras','notas','diario'];
 let applyingRemote = false;
 let syncStatus = {txt:'sem sincronização', cls:'erro'};
 
@@ -2173,19 +2185,20 @@ function renderHoje(){
   let html = '<div class="greet"><div><h1>'+greeting()+', Osmar</h1><p>'+DAY_FULL[todayKeyAny()]+', '+dataTxt+'</p></div></div>';
 
   const fk = todayFullKey();
-  const focusList = focusForDate(fk);
+  const focusList = blocosDoDia(fk);
   const especial = FOCUS_DATA[fk];
-  const doneCount = focusList.filter((f,idx)=>state.blocoChecks[blocoCheckKey(fk, idx)]).length;
+  const doneCount = focusList.filter(f=>state.blocoChecks[f.checkKey]).length;
   const pct = focusList.length ? Math.round(doneCount/focusList.length*100) : 0;
 
   let blocos = '<div class="card">' + cardHead('target', especial ? especial.titulo : 'Blocos de estudo','var(--accent)') + (especial ? '<div class="hint" style="margin:0 0 10px">'+especial.dica+'</div>' : cicloToggleHtml());
   if(focusList.length){
     blocos += '<div class="prog"><div class="track"><div class="fill" style="width:'+pct+'%"></div></div><span class="n">'+doneCount+'/'+focusList.length+'</span></div>';
     blocos += focusList.map((f,idx)=>renderFocusItem(f, idx, fk)).join('');
-    blocos += '<div class="hint" style="margin:12px 0 0">Horários sugeridos. Marcar aqui não conta como minutos estudados; pra isso use a sessão de estudo.</div>';
   } else {
     blocos += '<div class="empty">'+ic('coffee')+'Nenhum bloco sugerido pra hoje.</div>';
   }
+  blocos += renderAddBloco();
+  if(focusList.length) blocos += '<div class="hint" style="margin:12px 0 0">Horários sugeridos. Marcar aqui não conta como minutos estudados; pra isso use a sessão de estudo.</div>';
   blocos += '</div>';
 
   let sessao = '<div class="card">' + cardHead('timer','Sessão de estudo','var(--s1)');
@@ -2298,6 +2311,60 @@ function escapeHtml(s){
 }
 
 function blocoCheckKey(dateKey, idx){ return dateKey+'|'+idx; }
+/* Blocos do dia = plano (sugerido) + blocos extras que você adicionou, em ordem de horário. */
+function blocosDoDia(dateKey){
+  const plano = focusForDate(dateKey).map((f,idx)=>Object.assign({}, f, {checkKey: blocoCheckKey(dateKey, idx)}));
+  const meus = (state.blocosExtras||[]).filter(b=>b.date===dateKey).map(b=>({
+    time: b.inicio ? (b.inicio + (b.fim ? '–'+b.fim : '')) : '',
+    subject: b.subject, subtopic: b.subtopic || undefined, extra: b.titulo ? escapeHtml(b.titulo) : '',
+    note: b.nota ? escapeHtml(b.nota) : '', checkKey: dateKey+'|x:'+b.id, meuId: b.id
+  }));
+  const t = f => { const m = hm2min(String(f.time||'').split('–')[0]); return m===null ? 9999 : m; };
+  return plano.concat(meus).sort((a,b)=>t(a)-t(b));
+}
+let addBlocoAberto = false;
+function abrirAddBloco(v){ addBlocoAberto = v; render(); if(v){ const el=document.getElementById('bx-titulo'); if(el) el.focus(); } }
+function horaAgoraHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function horaMais(hm, min){ const m=hm2min(hm); if(m===null) return ''; const t=Math.min(m+min, 23*60+59); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); }
+function renderAddBloco(){
+  if(!addBlocoAberto) return '<button class="btn bx-add" onclick="abrirAddBloco(true)">'+ic('plus')+'Adicionar bloco de estudo</button>';
+  const agora = horaAgoraHM();
+  const keys = Object.keys(state.subjects).sort((a,b)=>state.subjects[a].slot-state.subjects[b].slot);
+  const opts = keys.map(k=>'<option value="'+k+'">'+escapeHtml(state.subjects[k].name)+'</option>').join('') + '<option value="geral">Outro / organização</option>';
+  return '<div class="bx-form">' +
+    '<div class="bx-title">'+ic('plus')+'Novo bloco de estudo (hoje)</div>' +
+    '<div class="form-row">' +
+      '<select id="bx-subj" aria-label="Matéria">'+opts+'</select>' +
+      '<input type="time" id="bx-ini" value="'+agora+'" aria-label="Começo" title="Começo">' +
+      '<span class="bx-ate">até</span>' +
+      '<input type="time" id="bx-fim" value="'+horaMais(agora,50)+'" aria-label="Fim (opcional)" title="Fim (opcional)">' +
+    '</div>' +
+    '<input type="text" id="bx-titulo" placeholder="O que está estudando? Ex.: Aceleração de amanhã · Morfo e PI Neuro" onkeydown="if(event.key===\'Enter\'){salvarBlocoExtra();}">' +
+    '<textarea id="bx-nota" rows="2" placeholder="Detalhes (opcional): tópicos, páginas, o que falta…"></textarea>' +
+    '<div class="row"><button class="btn primary" onclick="salvarBlocoExtra()">'+ic('check')+'Adicionar</button>' +
+    '<button class="btn ghost" onclick="abrirAddBloco(false)">Cancelar</button></div>' +
+  '</div>';
+}
+function salvarBlocoExtra(){
+  const g = id => (document.getElementById(id)||{}).value || '';
+  const titulo = g('bx-titulo').trim(), nota = g('bx-nota').trim();
+  if(!titulo && !nota){ aviso('Escreva o que você está estudando.'); const el=document.getElementById('bx-titulo'); if(el) el.focus(); return; }
+  const subject = g('bx-subj') || 'geral';
+  const inicio = g('bx-ini') || null, fim = g('bx-fim') || null;
+  state.blocosExtras = (state.blocosExtras||[]).filter(b=>b.date >= localDateKey(new Date(Date.now()-60*86400000)));
+  state.blocosExtras.push({id:uid(), date:todayFullKey(), subject, inicio, fim, titulo, nota, criadoEm:Date.now()});
+  addBlocoAberto = false;
+  saveState(); render();
+  aviso('Bloco adicionado'+(inicio?' às '+inicio:''));
+}
+async function apagarBlocoExtra(id){
+  const b = (state.blocosExtras||[]).find(x=>x.id===id);
+  if(!b) return;
+  if(!(await confirmar('Apagar o bloco "'+(b.titulo||'sem título')+'"?'))) return;
+  state.blocosExtras = state.blocosExtras.filter(x=>x.id!==id);
+  delete state.blocoChecks[b.date+'|x:'+id];
+  saveState(); render();
+}
 function toggleBlocoCheck(key){
   state.blocoChecks[key] = !state.blocoChecks[key];
   saveState(); render();
@@ -2314,16 +2381,18 @@ function renderFocusItem(f, idx, checkDateKey){
   const chipHtml = isGeral ? '<span class="chip" style="--c:var(--ink-3)">'+ic('layers')+'Organização</span>' : chip(f.subject);
   let checkbox = '', done = false;
   if(checkDateKey){
-    const key = blocoCheckKey(checkDateKey, idx);
+    const key = f.checkKey || blocoCheckKey(checkDateKey, idx);
     done = !!state.blocoChecks[key];
     checkbox = '<input type="checkbox" class="ck" aria-label="Marcar bloco como feito" '+(done?'checked':'')+' onchange="toggleBlocoCheck(\''+key+'\')">';
   }
   const tag = checkDateKey ? 'label' : 'div';
-  return '<'+tag+' class="blk'+(done?' done':'')+(st==='now' && !done?' now':'')+(checkDateKey?'':' static')+'" style="--c:'+color+'">' +
+  const meu = !!f.meuId;
+  const delBtn = meu ? '<button class="icon-only b-del" onclick="event.preventDefault();event.stopPropagation();apagarBlocoExtra(\''+f.meuId+'\')" title="Apagar este bloco" aria-label="Apagar este bloco">'+ic('x')+'</button>' : '';
+  return '<'+tag+' class="blk'+(done?' done':'')+(meu?' meu':'')+(st==='now' && !done?' now':'')+(checkDateKey?'':' static')+'" style="--c:'+color+'">' +
     checkbox +
     '<div class="b-main">' +
-      '<div class="b-top">'+(f.time?'<span class="b-time">'+f.time+'</span>':'')+chipHtml+(extra?'<span class="b-extra">'+extra+'</span>':'')+(st==='now' && !done?'<span class="now-tag">agora</span>':'')+'</div>' +
-      '<div class="b-note">'+f.note+'</div>' +
+      '<div class="b-top">'+(f.time?'<span class="b-time">'+f.time+'</span>':'')+chipHtml+(extra?'<span class="b-extra">'+extra+'</span>':'')+(meu?'<span class="meu-tag">extra</span>':'')+(st==='now' && !done?'<span class="now-tag">agora</span>':'')+delBtn+'</div>' +
+      (f.note?'<div class="b-note">'+f.note+'</div>':'') +
     '</div>' +
   '</'+tag+'>';
 }
@@ -2619,8 +2688,8 @@ function blocosNaoFeitos(dayKey){
   const prefix = dayKey+'|';
   const marcou = Object.keys(state.blocoChecks).some(k=>k.startsWith(prefix) && state.blocoChecks[k]);
   if(!marcou) return null;
-  const lista = focusForDate(dayKey);
-  const falt = lista.filter((f,idx)=>!state.blocoChecks[blocoCheckKey(dayKey, idx)]);
+  const lista = blocosDoDia(dayKey);
+  const falt = lista.filter(f=>!state.blocoChecks[f.checkKey]);
   return falt.length ? {falt, total:lista.length} : null;
 }
 function histItem(h, actions){
