@@ -596,6 +596,10 @@ textarea.importar{min-height:90px;font:12.5px var(--mono);}
 .n-good{background:color-mix(in srgb,var(--good) 12%,transparent);}
 .n-good .ic{color:var(--good);margin-top:2px;}
 .n-info{background:var(--surface-2);}
+.n-oficial{padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:color-mix(in srgb,var(--accent) 6%,var(--surface));margin-bottom:14px;}
+.n-of-h{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:14.5px;}
+.n-of-h .ic{color:var(--accent);}
+.n-of-pub{font:800 24px var(--mono);}
 .n-info .ic{color:var(--accent);margin-top:2px;}
 .n-labs{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;}
 .n-labs .row{gap:6px;flex-wrap:nowrap;}
@@ -3172,7 +3176,7 @@ function renderNotas(){
   html += '</div>';
   // módulos do semestre
   html += '<h3>Módulos de tutoria + Morfo/PI</h3><div class="n-mods">' + mods.map(x=>{
-    const v = x.i.completo ? x.i.finalOficial : null;
+    const v = x.i.completo ? x.i.finalOficial : (x.m.oficial ? nv(x.m.oficial.publicada) : null);
     const on = x.m.id===atual.m.id;
     return '<button class="n-mod'+(on?' on':'')+'" onclick="setModuloAtual(\''+x.m.id+'\')"><span class="n-mod-n">'+escapeHtml(x.m.nome)+'</span>' +
       '<span class="n-mod-v" style="color:'+notaCor(v!==null?v:x.i.probAvg)+'">'+(v!==null?fmtN(v):(x.i.nProbs?'em curso':'—'))+'</span></button>';
@@ -3231,6 +3235,7 @@ function renderModuloNotas(m, I, mi){
 
   // composição
   html += '<div class="card">' + cardHead('target','Média final do módulo','var(--accent)');
+  html += renderOficial(m);
   html += '<div class="n-comp">' + I.comp.map(c=>{
     return '<div class="n-crow"><span class="n-cn">'+c.nome+'<small>peso '+Math.round(c.peso*100)+'%</small></span>' +
       '<span class="n-cv" style="color:'+notaCor(c.nota)+'">'+fmtN(c.nota)+'</span><span class="n-cp">'+(c.pts===null?'—':'+'+fmtN(c.pts))+'</span></div>';
@@ -3255,7 +3260,39 @@ function renderModuloNotas(m, I, mi){
 
 /* ---------- diário do dia a dia (hábitos + sono) ---------- */
 
-function normalizarExtras(){ state.notas = notasFix(state.notas && Array.isArray(state.notas.modulos) ? state.notas : notasSeed()); state.diario = diarioFix(state.diario);  if(injetarPrazos()) setTimeout(()=>{ saveState(); render(); },0); }
+function normalizarExtras(){ state.notas = notasFix(state.notas && Array.isArray(state.notas.modulos) ? state.notas : notasSeed()); state.diario = diarioFix(state.diario);  if(injetarPrazos() | injetarOficiais()) setTimeout(()=>{ saveState(); render(); },0); }
+/* resultados oficiais publicados pela faculdade: entram uma vez só (depois você pode editar à vontade) */
+const OFICIAIS_CLAUDE = [
+  {id:'oficial-m2-20261109', modulo:'m2', fonte:'Médias e Resultados · 3ª Etapa C · Módulo II',
+   probs:'4,97', tutoria:'5,72', mfpi:'5,64', publicada:'5,50', resultado:'Aceleração facultativa de tutoria e LMF+LPI'}
+];
+function injetarOficiais(){
+  if(!state || !state.notas || !Array.isArray(state.notas.modulos)) return false;
+  if(!state.settings) state.settings = {};
+  const feitos = Array.isArray(state.settings.oficiaisClaude) ? state.settings.oficiaisClaude : [];
+  let changed = false;
+  OFICIAIS_CLAUDE.forEach(o=>{
+    if(feitos.includes(o.id)) return;
+    const m = state.notas.modulos.find(x=>x.id===o.modulo);
+    if(m){
+      m.oficial = {fonte:o.fonte, probs:o.probs, tutoria:o.tutoria, mfpi:o.mfpi, publicada:o.publicada, resultado:o.resultado};
+      if(!String(m.mediaMFPI||'').trim()) m.mediaMFPI = o.mfpi;
+    }
+    feitos.push(o.id); changed = true;
+  });
+  state.settings.oficiaisClaude = feitos;
+  return changed;
+}
+function renderOficial(m){
+  const o = m.oficial; if(!o) return '';
+  const lin = (nome, v, peso)=>'<div class="n-crow"><span class="n-cn">'+nome+(peso?'<small>'+peso+'</small>':'')+'</span><span class="n-cv" style="color:'+notaCor(nv(v))+'">'+escapeHtml(v||'—')+'</span><span></span></div>';
+  return '<div class="n-oficial">' +
+    '<div class="n-of-h">'+ic('check')+'<b>Resultado oficial</b><span class="spacer"></span><span class="n-of-pub" style="color:'+notaCor(nv(o.publicada))+'">'+escapeHtml(o.publicada)+'</span></div>' +
+    '<div class="n-comp">' + lin('Média dos problemas', o.probs) + lin('Média tutoria', o.tutoria, '70% do módulo') + lin('Média MF + PI', o.mfpi, '30% do módulo') + '</div>' +
+    (o.resultado ? '<div class="n-alert" style="margin-top:8px">'+ic('alert')+'<span>'+escapeHtml(o.resultado)+'</span></div>' : '<div class="n-good" style="margin-top:8px">'+ic('check')+'Aprovado no módulo</div>') +
+    '<div class="hint" style="margin:8px 0 0">Fonte: '+escapeHtml(o.fonte)+'. A média publicada sai arredondada pra baixo de 0,5 em 0,5. Na planilha oficial, problema sem nota lançada conta como zero, por isso a média dos problemas pode ficar abaixo da calculada aqui embaixo.</div>' +
+  '</div>';
+}
 /* prazos cadastrados pelo Claude: entram uma vez só (se apagar, não voltam) */
 const PRAZOS_CLAUDE = [
   {id:'claude-hm-colo-20261109', text:'Entregar exercício de Rastreamento de Ca de Colo Uterino (HM III · Prof. Selvio) no Blackboard', subject:'hm', dueDate:'2026-11-09', dueTime:'22:00',
@@ -3523,7 +3560,7 @@ function init(){
   setInterval(updateLiveClock, 1000);
   setInterval(updateTaskCountdowns, 30000);
   setInterval(()=>{ cycleRecurringTasks(); checkTaskDeadlines(); }, 60000);
-  if(injetarPrazos()) saveState();
+  if(injetarPrazos() | injetarOficiais()) saveState();
   cycleRecurringTasks();
   checkTaskDeadlines();
 
