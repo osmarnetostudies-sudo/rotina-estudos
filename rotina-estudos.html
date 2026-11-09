@@ -3265,7 +3265,8 @@ function normalizarExtras(){ state.notas = notasFix(state.notas && Array.isArray
 const OFICIAIS_CLAUDE = [
   {id:'oficial-m2-20261109', modulo:'m2', fonte:'Médias e Resultados · 3ª Etapa C · Módulo II',
    probs:'4,97', tutoria:'5,72', mfpi:'5,64', publicada:'5,50', resultado:'Aceleração facultativa de tutoria e LMF+LPI'},
-  {id:'zeros-m2-p5p6-20261109', modulo:'m2', zerarFe:[4,5]}
+  {id:'zeros-m2-p5p6-20261109', modulo:'m2', zerarFe:[4,5]},
+  {id:'fe-m2-p1p3-20261109', modulo:'m2', fixarFe:{0:['6','6','8'], 2:['6','6','8']}}
 ];
 function injetarOficiais(){
   if(!state || !state.notas || !Array.isArray(state.notas.modulos)) return false;
@@ -3275,7 +3276,9 @@ function injetarOficiais(){
   OFICIAIS_CLAUDE.forEach(o=>{
     if(feitos.includes(o.id)) return;
     const m = state.notas.modulos.find(x=>x.id===o.modulo);
-    if(m && o.zerarFe){
+    if(m && o.fixarFe){
+      Object.keys(o.fixarFe).forEach(i=>{ const pr = m.problemas[+i]; if(pr){ pr.fe = o.fixarFe[i].slice(); pr.abF = false; } });
+    } else if(m && o.zerarFe){
       o.zerarFe.forEach(i=>{ const pr = m.problemas[i]; if(pr && !pr.abF && pr.fe.every(v=>!String(v).trim())) pr.fe = ['0','0','0']; });
     } else if(m){
       m.oficial = {fonte:o.fonte, probs:o.probs, tutoria:o.tutoria, mfpi:o.mfpi, publicada:o.publicada, resultado:o.resultado};
